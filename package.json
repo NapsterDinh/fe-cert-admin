@@ -1,0 +1,57 @@
+{
+  "name": "fe-admin-senior-ute",
+  "version": "0.1.0",
+  "private": true,
+  "author": "NapsterDinh",
+  "description": "This project is Admin UI and CMS of FE training bla bla",
+  "dependencies": {
+    "@emotion/react": "^11.9.0",
+    "@emotion/styled": "^11.8.1",
+    "@fortawesome/fontawesome-svg-core": "^1.2.36",
+    "@fortawesome/free-brands-svg-icons": "^5.15.4",
+    "@fortawesome/free-regular-svg-icons": "^5.15.4",
+    "@fortawesome/free-solid-svg-icons": "^5.15.4",
+    "@fortawesome/react-fontawesome": "^0.1.17",
+    "@mui/icons-material": "^5.6.2",
+    "@mui/material": "^5.7.0",
+    "@mui/x-data-grid": "^5.11.0",
+    "@reduxjs/toolkit": "^1.6.2",
+    "@testing-library/jest-dom": "^4.2.4",
+    "@testing-library/react": "^9.3.2",
+    "@testing-library/user-event": "^7.1.2",
+    "@themesberg/react-bootstrap": "^1.4.1",
+    "axios": "^0.24.0",
+    "bootstrap": "5.0.0-beta1",
+    "formik": "^2.2.9",
+    "jodit-react": "^1.3.1",
+    "moment": "^2.29.3",
+    "react": "^17.0.2",
+    "react-datetime": "^3.0.4",
+    "react-dom": "^17.0.2",
+    "react-loading-overlay": "^1.0.1",
+    "react-notifications-component": "^3.1.0",
+    "react-redux": "^7.2.3",
+    "react-router-dom": "^5.3.0",
+    "react-scripts": "4.0.3",
+    "react-transition-group": "^4.4.1",
+    "redux-persist": "^6.0.0",
+    "redux-persist-transform-encrypt": "^3.0.1",
+    "sass": "^1.49.10",
+    "simplebar-react": "^2.3.0",
+    "yup": "^0.32.11"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not op_mini all"
+  ]
+}

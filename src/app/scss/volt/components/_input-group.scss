@@ -1,0 +1,80 @@
+/**
+ * = Input groups
+ */
+input[type="checkbox"]
+{
+	cursor: pointer;
+}
+
+.input-group {
+	border-radius: $input-border-radius;
+	transition: $transition-base;
+	border: 1px solid rgb(209, 215, 224);
+	position: relative;
+
+	&:focus-within
+	{
+		outline: 1px solid #262B40;
+		border: 1px solid transparent!important;
+	}
+
+	span, input
+	{
+		border: none!important;
+	}
+
+	&.error
+	{
+		border-color: var(--bs-red)!important;
+		outline: none!important;
+		&:focus-within
+		{
+			input, span{
+				border-color: white;
+			}
+		}
+	}
+
+	.form-control {
+		box-shadow: none;
+
+		&:not(:first-child) {
+		    	border-left: 0;
+		    	padding-left: 0;
+		}
+		&:not(:last-child) {
+			border-right: 0;
+			padding-right: 0;
+		}
+		&:focus {
+			box-shadow: none;
+		}
+	}
+}
+
+.input-group-text {
+	font-size: $font-size-sm;
+	transition: $input-transition;
+	border-right:0;
+}
+
+
+
+.input-group-prepend {
+	margin-right: -2px;
+}
+
+// .focus class is applied dinamycally from theme.js
+
+.focused {
+
+	.input-group-text {
+	    	color: $input-group-addon-focus-color;
+	    	background-color: $input-group-addon-focus-bg;
+	}
+
+	.input-group-shadow{
+		box-shadow:$shadow-input-focus;
+	}
+}
+
