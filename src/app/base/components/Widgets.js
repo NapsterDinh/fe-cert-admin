@@ -4,7 +4,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAngleDown, faAngleUp, faChartArea, faChartBar, faChartLine, faFlagUsa, faFolderOpen, faGlobeEurope, faPaperclip, faUserPlus } from '@fortawesome/free-solid-svg-icons';
 import { faAngular, faBootstrap, faReact, faVuejs } from "@fortawesome/free-brands-svg-icons";
 import { Col, Row, Card, Image, Button, ListGroup, ProgressBar } from '@themesberg/react-bootstrap';
-import { CircleChart, BarChart, SalesValueChart, SalesValueChartphone } from "./Charts";
 
 import Profile1 from "../assets/img/team/profile-picture-1.jpg";
 import ProfileCover from "../assets/img/profile-cover.jpg";
@@ -108,7 +107,6 @@ export const CircleChartWidget = (props) => {
       <Card.Body>
         <Row className="d-block d-xl-flex align-items-center">
           <Col xs={12} xl={5} className="text-xl-center d-flex align-items-center justify-content-xl-center mb-3 mb-xl-0">
-            <CircleChart series={series} />
           </Col>
           <Col xs={12} xl={7} className="px-xl-0">
             <h5 className="mb-3">{title}</h5>
@@ -156,7 +154,6 @@ export const BarChartWidget = (props) => {
         </div>
       </Card.Body>
       <Card.Body className="p-2">
-        <BarChart labels={labels} series={series} />
       </Card.Body>
     </Card>
   );
@@ -330,7 +327,7 @@ export const SalesValueWidget = (props) => {
         </div>
       </Card.Header>
       <Card.Body className="p-2">
-        <SalesValueChart />
+      
       </Card.Body>
     </Card>
   );
@@ -363,7 +360,7 @@ export const SalesValueWidgetPhone = (props) => {
         </div>
       </Card.Header>
       <Card.Body className="p-2">
-        <SalesValueChartphone />
+        
       </Card.Body>
     </Card>
   );

@@ -1,9 +1,6 @@
-import React, { useRef, useState } from 'react';
-import JoditEditor from "jodit-react";
+import React, { useState } from 'react';
 import { Modal, Button, Form, Col, Row, InputGroup } from "@themesberg/react-bootstrap";
 import './ModalNewQuestion.css'
-import { ErrorMessage, Formik } from "formik";
-import * as Yup from "yup"
 import { addNewQuestion } from 'app/core/apis/question';
 
 

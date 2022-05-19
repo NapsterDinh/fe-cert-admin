@@ -1,6 +1,5 @@
 import axios from "axios";
 import configuration from "../../../configuration";
-import { showNotification, type } from "app/base/components/Notification";
 
 export const instance = axios.create({
   baseURL: configuration.ApiUrl,
@@ -31,9 +30,6 @@ instance.interceptors.response.use(
     return response;
   },
   (error) => {
-    // console.warn("Error status", error);
-    showNotification('Error', error, type.danger, 3000)
-
     const code = error.response.status;
     const config = error.response.config;
 

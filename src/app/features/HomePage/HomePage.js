@@ -60,6 +60,17 @@ const HomePage = () => (
         component={Routes.QuestionPage.element}
       />
 
+      <RouteWithSidebar
+        exact={Routes.ExamPage.exact}
+        path={Routes.ExamPage.path}
+        component={Routes.ExamPage.element}
+      />
+      <RouteWithSidebar
+        exact={Routes.NewExamPage.exact}
+        path={Routes.NewExamPage.path}
+        component={Routes.NewExamPage.element}
+      />
+
       <Route component={NotFound} />
       <Route exact={Routes.LockPage.exact} path={Routes.LockPage.path} component={LockPage} />
       <Route exact={Routes.ServerErrorPage.exact} path={Routes.ServerErrorPage.path} component={ServerError} />

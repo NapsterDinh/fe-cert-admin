@@ -1,10 +1,8 @@
-// Here are more informations about the scroll restoration of React Router
-// https://reactrouter.com/web/guides/scroll-restoration
 
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 
-export default () => {
+const ScrollToTop =  () => {
   const { pathname } = useLocation();
 
   useEffect(() => {
@@ -13,3 +11,5 @@ export default () => {
 
   return null;
 }
+
+export default ScrollToTop

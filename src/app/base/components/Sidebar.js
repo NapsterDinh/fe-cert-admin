@@ -4,33 +4,24 @@ import { useLocation } from "react-router-dom";
 import { CSSTransition } from "react-transition-group";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faBook,
-  faBoxOpen,
   faChartPie,
   faCog,
-  faFileAlt,
   faHandHoldingUsd,
   faSignOutAlt,
-  faTable,
   faTimes,
-  faCalendarAlt,
-  faMapPin,
   faInbox,
-  faRocket,
 } from "@fortawesome/free-solid-svg-icons";
 import {
   Nav,
   Badge,
   Image,
   Button,
-  Dropdown,
   Accordion,
   Navbar,
 } from "@themesberg/react-bootstrap";
 import { Link } from "react-router-dom";
 
 import { Routes } from "app/routes";
-import ThemesbergLogo from "../assets/img/themesberg.svg";
 import ReactHero from "../assets/img/technologies/react-hero-logo.svg";
 import ProfilePicture from "../assets/img/team/profile-picture-3.jpg";
 
@@ -190,9 +181,14 @@ const Sidebar = () => {
                 icon={faInbox}
               />
               <NavItem
-                title="Module Management"
+                title={Routes.ModulePage.name}
                 icon={faHandHoldingUsd}
                 link={Routes.ModulePage.path}
+              />
+              <NavItem
+                title={Routes.ExamPage.name}
+                icon={faCog}
+                link={Routes.ExamPage.path}
               />
               <NavItem
                 title={Routes.QuestionPage.name}

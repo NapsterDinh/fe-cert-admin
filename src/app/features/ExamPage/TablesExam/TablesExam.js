@@ -1,9 +1,11 @@
 import React from 'react';
 import { DataGrid } from '@mui/x-data-grid';
-import { Card  } from '@themesberg/react-bootstrap';
-import './TableQuestion.css'
 
-export const TablesQuestion = ({ data, title, handleShow }) => {
+import { Card} from '@themesberg/react-bootstrap';
+import './TableExam.css'
+
+
+export const TableExam = ({ data, title, handleShow }) => {
   const [pageSize, setPageSize] = React.useState(10);
 
   return (
@@ -24,11 +26,20 @@ export const TablesQuestion = ({ data, title, handleShow }) => {
               '.MuiDataGrid-columnHeader:nth-child(1)': {
                 flexBasis: '5%!important',
               },
+              '.MuiDataGrid-columnHeader:nth-child(2)': {
+                flexBasis: '10%!important',
+              },
+              '.MuiDataGrid-columnHeader:nth-child(3)': {
+                flexBasis: '10%!important',
+              },
               '.MuiDataGrid-columnHeader:nth-child(4)': {
-                flexBasis: '40%!important',
+                flexBasis: '30%!important',
+              },
+              '.MuiDataGrid-columnHeader:nth-child(5)': {
+                flexBasis: '20%!important',
               },
               '.MuiDataGrid-columnHeader:nth-child(6)': {
-                flexBasis: '8%!important',
+                flexBasis: '10%!important',
               },
               '.MuiDataGrid-row .MuiDataGrid-cell': {
                 flex: `0 0 15%;`,
@@ -41,8 +52,17 @@ export const TablesQuestion = ({ data, title, handleShow }) => {
               '.MuiDataGrid-row .MuiDataGrid-cell:nth-child(1)': {
                 flexBasis: '5%!important',
               },
+              '.MuiDataGrid-row .MuiDataGrid-cell:nth-child(2)': {
+                flexBasis: '10%!important',
+              },
+              '.MuiDataGrid-row .MuiDataGrid-cell:nth-child(3)': {
+                flexBasis: '10%!important',
+              },
               '.MuiDataGrid-row .MuiDataGrid-cell:nth-child(4)': {
-                flexBasis: '40%!important',
+                flexBasis: '30%!important',
+              },
+              '.MuiDataGrid-row .MuiDataGrid-cell:nth-child(5)': {
+                flexBasis: '20%!important',
               },
               '.MuiDataGrid-row .MuiDataGrid-cell:nth-child(6)': {
                 flexBasis: '10%!important',
@@ -65,6 +85,6 @@ export const TablesQuestion = ({ data, title, handleShow }) => {
   );
 };
 
-export default TablesQuestion;
+export default TableExam;
 
 

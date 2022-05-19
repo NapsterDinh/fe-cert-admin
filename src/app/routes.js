@@ -24,6 +24,12 @@ const DetailModule = React.lazy(() =>
 const QuestionPage = React.lazy(() =>
 import("app/features/QuestionPage/QuestionPage")
 );
+const ExamPage = React.lazy(() =>
+import("app/features/ExamPage/ExamPage")
+);
+const NewExamPage = React.lazy(() =>
+import("app/features/ExamPage/NewExamPage/NewExamPage")
+);
 
 export const Routes = {
   // pages
@@ -45,21 +51,21 @@ export const Routes = {
   },
   //tutorial
   ModulePage: {
-    path: "/module",
+    path: "/topic-management",
     exact: true,
-    name: "Module Management",
+    name: "Topic Management",
     element: ModulePage,
   },
   DetailModule: {
-    path: "/module/:id/tutorial",
+    path: "/topic/:id/document",
     exact: true,
-    name: "Detail Module",
+    name: "Detail Topic",
     element: DetailModule,
   },
   EditorTutorial: {
-    path: ["/module/:id/tutorial/create", "/module/:id/tutorial/:idTutorial/edit"],
+    path: ["/topic/:id/document/create", "/topic/:id/document/:idTutorial/edit"],
     exact: true,
-    name: "Editor Tutorial",
+    name: "Editor Document",
     element: EditorTutorial,
   },
   QuestionPage: {
@@ -67,6 +73,18 @@ export const Routes = {
     exact: true,
     name: "Question Management",
     element: QuestionPage,
+  },
+  ExamPage: {
+    path: "/exam-management",
+    exact: true,
+    name: "Exam Management",
+    element: ExamPage,
+  },
+  NewExamPage: {
+    path: ["/exam-management/add", "/exam-management/:idExam"],
+    exact: true,
+    name: "Create a new exam",
+    element: NewExamPage,
   },
 
 };
