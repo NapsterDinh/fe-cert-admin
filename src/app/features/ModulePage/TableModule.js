@@ -2,10 +2,8 @@ import React from 'react';
 import { DataGrid } from '@mui/x-data-grid';
 
 import { Card} from '@themesberg/react-bootstrap';
-import './TableExam.css'
 
-
-export const TableExam = ({ data, title, handleShow }) => {
+export const TableModule = ({ data, title, handleShow }) => {
   const [pageSize, setPageSize] = React.useState(10);
 
   return (
@@ -30,10 +28,10 @@ export const TableExam = ({ data, title, handleShow }) => {
                 flexBasis: '5%!important',
               },
               '.MuiDataGrid-columnHeader:nth-child(2)': {
-                flexBasis: '20%!important',
+                flexBasis: '10%!important',
               },
               '.MuiDataGrid-columnHeader:nth-child(3)': {
-                flexBasis: '15%!important',
+                flexBasis: '25%!important',
               },
               '.MuiDataGrid-columnHeader:nth-child(4)': {
                 flexBasis: '25%!important',
@@ -56,10 +54,14 @@ export const TableExam = ({ data, title, handleShow }) => {
                 flexBasis: '5%!important',
               },
               '.MuiDataGrid-row .MuiDataGrid-cell:nth-child(2)': {
-                flexBasis: '20%!important',
+                flexBasis: '10%!important',
               },
               '.MuiDataGrid-row .MuiDataGrid-cell:nth-child(3)': {
-                flexBasis: '15%!important',
+                flexBasis: '25%!important',
+                justifyContent: 'left'
+              },
+              '.MuiDataGrid-row .MuiDataGrid-cell:nth-child(3) .MuiDataGrid-actionsCell': {
+                marginLeft: '10px'
               },
               '.MuiDataGrid-row .MuiDataGrid-cell:nth-child(4)': {
                 flexBasis: '25%!important',
@@ -77,10 +79,6 @@ export const TableExam = ({ data, title, handleShow }) => {
             rows={data}
             columns={title}
             checkboxSelection
-            pageSize={pageSize}
-            onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-            rowsPerPageOptions={[10, 20, 30, 40]}
-            pagination
           />
         </div>
       </Card.Body>
@@ -88,6 +86,6 @@ export const TableExam = ({ data, title, handleShow }) => {
   );
 };
 
-export default TableExam;
+export default TableModule;
 
 

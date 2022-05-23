@@ -1,51 +1,66 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-    Button,
-    ButtonGroup,
-    Breadcrumb,
-} from "@themesberg/react-bootstrap";
-import {
-    faHome,
-    faPlus,
+    faEdit, faEye, faHome,
+    faPlus
 } from "@fortawesome/free-solid-svg-icons";
-//components
-import ModalAddNewQuestion from "./ModalAddNewQuestion/ModalNewQuestion";
-import TablesQuestion from './TablesQuestion/TablesQuestion'
-//data
-import { Routes } from "app/routes";
-import { GridActionsCellItem } from '@mui/x-data-grid';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import DeleteIcon from '@mui/icons-material/Delete';
+import { GridActionsCellItem } from '@mui/x-data-grid';
+import {
+    Breadcrumb, Button,
+    ButtonGroup
+} from "@themesberg/react-bootstrap";
+import ModalConfirmDelete from 'app/base/components/ModalConfirmDelete/ModalConfirmDelete';
+import { openNotificationWithIcon } from "app/base/components/Notification";
+import { deleteQuestion, getAllQuestions, getQuestionById } from 'app/core/apis/question';
+//data
 
-import { faEdit, faEye } from '@fortawesome/free-solid-svg-icons';
-import { getAllQuestions, getQuestionById, deleteQuestion } from 'app/core/apis/question';
+import { Routes } from "app/routes";
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+//components
+import { useDispatch, useSelector } from 'react-redux';
+import { toggleShowModal, updateModalInfo } from 'store/confirmDeleteReducer';
+import ModalAddNewQuestion from "./ModalAddNewQuestion/ModalNewQuestion";
+import TablesQuestion from './TablesQuestion/TablesQuestion';
+import { Tooltip } from "antd";
 
 const QuestionPage = () => {
     const [data, setData] = useState([])
     const [show, setShow] = useState(false);
 
+    const modalConfirmDelete = useSelector(state => state.confirmDelete)
+    const dispatch = useDispatch()
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
     const [currentQuestion, setCurrentQuestion] = useState('')
+    const [itemChooseDelete, setItemChooseDelete] = useState('')
 
+    dispatch(updateModalInfo(
+        {
+            title: 'Confirm delete this question',
+            body: `Are you sure to delete this question ?
+            This question in exam which contains this will be remove.
+            This modified changes will not saved and you can't rollback`
+        }
+    ))
+
+    const handleDeleteQuestion = async () => {
+        try {
+            const response = await deleteQuestion({
+                _id: itemChooseDelete
+            })
+            if (response.status === 200) {
+                await fetchQuestionList()
+                dispatch(toggleShowModal({ show: false }))
+                openNotificationWithIcon('success', 'Delete question successfully')
+            }
+        } catch (error) {
+            alert(error)
+        }
+    }
     const deleteUser = useCallback(
         (id) => () => {
-            console.log(data);
-            (async () => {
-                try {
-                    const response = await deleteQuestion({
-                        _id: id
-                    })
-                    if (response.status === 200) {
-                        let temp = [...data]
-                        const index = temp?.findIndex(item => item.id = id)
-                        temp.splice(index, 1)
-                        setData(temp)
-                    }
-                } catch (error) {
-                    alert(error)
-                }
-            })()
+            setItemChooseDelete(id)
+            dispatch(toggleShowModal({ show: true }))
         },
         [data],
     );
@@ -55,7 +70,7 @@ const QuestionPage = () => {
             try {
                 const response = await getQuestionById(id)
                 if (response.status === 200) {
-                    await setCurrentQuestion(response.data?.question[0]);
+                    setCurrentQuestion(response.data?.question[0]);
                     handleShow()
                 }
             } catch (error) {
@@ -69,8 +84,17 @@ const QuestionPage = () => {
             {
                 field: 'id',
                 headerName: 'ID',
-                type: 'string',
-                align: 'left'
+                type: 'actions',
+                align: 'left',
+                getActions: (params) => {
+                    return(
+                        [
+                            <Tooltip title={params.row.id} color={'#108ee9'} key={'#108ee9'}>
+                                {params.row.id}
+                            </Tooltip>
+                        ]
+                    )
+                }
             },
             {
                 field: 'type',
@@ -84,8 +108,15 @@ const QuestionPage = () => {
             },
             {
                 field: 'createdAt',
-                type: 'dateTime',
+                type: 'actions',
                 headerName: 'Date Created',
+                getActions: (params) => {
+                    return(
+                        [
+                            <span className="text-center">{new Date(params.row.createdAt).toLocaleDateString()}</span>
+                        ]
+                    )
+                }
             },
             {
                 field: 'actions',
@@ -140,13 +171,25 @@ const QuestionPage = () => {
         })()
     }, []);
 
+    useEffect(() => {
+        if (currentQuestion !== '') {
+            handleShow()
+        }
+    }, [currentQuestion])
 
 
     return (
         <>
             <ModalAddNewQuestion
                 fetchQuestionList={fetchQuestionList}
-                show={show} handleClose={handleClose} item={currentQuestion} />
+                show={show} handleClose={handleClose} item={currentQuestion} 
+                setItem={setCurrentQuestion}
+                />
+            <ModalConfirmDelete
+                handleSubmit={handleDeleteQuestion}
+                handleClose={() => dispatch(toggleShowModal({ show: false }))}
+                {...modalConfirmDelete}
+            />
             <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4">
                 <div className="d-block mb-4 mb-md-0">
                     <Breadcrumb

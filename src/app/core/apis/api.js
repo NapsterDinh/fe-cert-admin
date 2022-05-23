@@ -43,7 +43,7 @@ instance.interceptors.response.use(
         if (data?.data) {
           if (!data?.data?.token) {
             configuration.setApiRequestToken("");
-            window.location.href = "/login";
+            // window.location.href = "/login";
             return;
           }
 
@@ -62,7 +62,7 @@ instance.interceptors.response.use(
     }
     else
     {
-      window.location = `http:/localhost:3000/${code}`
+      // window.location = `http:/localhost:3000/${code}`
     }
 
     return error.response;

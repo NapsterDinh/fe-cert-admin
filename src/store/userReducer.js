@@ -9,7 +9,8 @@ export const counterSlice = createSlice({
   initialState,
   reducers: {
     updateUser: (state, action) => {
-      state.user = action?.payload?.user;
+
+      state.user = action?.payload;
     },
   },
 });

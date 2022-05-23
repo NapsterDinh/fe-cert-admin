@@ -42,4 +42,14 @@
 // Components
 @import "volt/components";
 
+.jodit-container
+{
+    min-width: auto!important;
+}
+.MuiDataGrid-root
+{
+    border: none!important;
+    margin-top: 10px;
+}
+
 // write your custom styles here!

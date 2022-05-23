@@ -6,6 +6,7 @@ import { encryptTransform } from 'redux-persist-transform-encrypt';
 import thunk from "redux-thunk";
 
 import userReducer from "./userReducer";
+import confirmReducer from './confirmDeleteReducer'
 
 const persistConfig = {
   key: "root",
@@ -21,13 +22,16 @@ const persistConfig = {
 };
 
 const reducers = combineReducers({
-  user: userReducer
+  user: userReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, reducers);
 
 export const store = configureStore({
-  reducer: persistedReducer,
+  reducer: {
+    persist : persistedReducer,
+    confirmDelete: confirmReducer
+  },
   devTools: process.env.NODE_ENV !== "production",
   middleware: [thunk],
 });

@@ -31,6 +31,14 @@ const NewExamPage = React.lazy(() =>
 import("app/features/ExamPage/NewExamPage/NewExamPage")
 );
 
+const LessonsPage = React.lazy(() =>
+import("app/features/LessonsPage/LessonsPage")
+);
+
+const AddNewLessonsPage = React.lazy(() =>
+import("app/features/LessonsPage/AddNewLessonsPage")
+);
+
 export const Routes = {
   // pages
   LockPage: { path: "/lock", exact: true, name: "Lock Page", element: LockPage },
@@ -86,5 +94,16 @@ export const Routes = {
     name: "Create a new exam",
     element: NewExamPage,
   },
-
+  LessonsPage: {
+    path: "/lessons-management",
+    exact: true,
+    name: "Lessons Management",
+    element: LessonsPage,
+  },
+  AddNewLessonsPage: {
+    path: "/lessons-management/add",
+    exact: true,
+    name: "Add Lessons Management",
+    element: AddNewLessonsPage,
+  },
 };

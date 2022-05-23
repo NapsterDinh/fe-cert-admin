@@ -1,61 +1,62 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-    Button,
-    ButtonGroup,
-    Breadcrumb,
-} from "@themesberg/react-bootstrap";
-import {
-    faHome,
-    faPlus,
+    faEdit, faEye, faHome,
+    faPlus
 } from "@fortawesome/free-solid-svg-icons";
-import { useHistory } from 'react-router-dom';
-//components
-import ModalAddNewExam from "./ModalAddNewExam/ModalNewExam";
-import TablesExam from './TablesExam/TablesExam'
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import DeleteIcon from '@mui/icons-material/Delete';
+import { GridActionsCellItem } from '@mui/x-data-grid';
+import {
+    Breadcrumb, Button,
+    ButtonGroup
+} from "@themesberg/react-bootstrap";
+import { Tag, Tooltip } from "antd";
+import ModalConfirmDelete from 'app/base/components/ModalConfirmDelete/ModalConfirmDelete';
+import { openNotificationWithIcon } from "app/base/components/Notification";
+import { deleteExam, getAllExam } from "app/core/apis/exam";
 //data
 import { Routes } from "app/routes";
-import { GridActionsCellItem } from '@mui/x-data-grid';
-import DeleteIcon from '@mui/icons-material/Delete';
-
-import { examList } from 'app/data/exam';
-import { faEdit, faEye } from '@fortawesome/free-solid-svg-icons';
-import { getAllQuestions, getQuestionById, deleteQuestion } from 'app/core/apis/question';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { toggleShowModal, updateModalInfo } from 'store/confirmDeleteReducer';
+import TablesExam from './TablesExam/TablesExam';
 
 const ExamPage = () => {
     const [data, setData] = useState([])
     const [show, setShow] = useState(false);
 
+    const modalConfirmDelete = useSelector(state => state.confirmDelete)
+    const dispatch = useDispatch()
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
     const [currentQuestion, setCurrentQuestion] = useState('')
-    const history = useHistory()
 
+    dispatch(updateModalInfo(
+        {
+            title: 'Confirm delete this exam',
+            body: `Are you sure to delete this exam ?
+            This modified changes will not saved and you can't rollback`
+        }
+    ))
 
-    const deleteUserById = (id) => {
-        console.log(data);
-        let temp = [...data]
-        const index = temp?.findIndex(item => item.id = id)
-        temp.splice(index, 1)
-        console.log(temp);
-        setData(temp)
+    const handleDeleteExam = async () => {
+        try {
+            const response = await deleteExam({
+                _id: currentQuestion
+            })
+            if (response.status === 200) {
+                await fetchAllExam()
+                dispatch(toggleShowModal({ show: false }))
+                openNotificationWithIcon('success', 'Delete exam successfully')
+            }
+        } catch (error) {
+            alert(error)
+        }
     }
 
     const deleteUser = React.useCallback(
         (id) => () => {
-            console.log(data);
-            (async () => {
-                try {
-                    const response = await deleteQuestion({
-                        _id: id
-                    })
-                    if (response.status === 200) {
-                        deleteUserById(id)
-                    }
-                } catch (error) {
-                    alert(error)
-                }
-            })()
+            setCurrentQuestion(id)
+            dispatch(toggleShowModal({ show: true }))
         },
         [],
     );
@@ -70,8 +71,17 @@ const ExamPage = () => {
             {
                 field: 'id',
                 headerName: 'ID',
-                type: 'string',
-                align: 'left'
+                type: 'actions',
+                align: 'left',
+                getActions: (params) => {
+                    return(
+                        [
+                            <Tooltip title={params.row.id} color={'#108ee9'} key={'#108ee9'}>
+                                {params.row.id}
+                            </Tooltip>
+                        ]
+                    )
+                }
             },
             {
                 field: 'location',
@@ -84,14 +94,30 @@ const ExamPage = () => {
                 headerName: 'Title of Exam',
             },
             {
-                field: 'createdAt',
-                type: 'dateTime',
-                headerName: 'Date Created',
+                field: 'eventDate',
+                type: 'actions',
+                headerName: 'Event Date',
+                getActions: (params) => {
+                    return(
+                        [
+                            <span className="text-center">{new Date(params.row.eventDate).toLocaleDateString()}</span>
+                        ]
+                    )
+                }
             },
             {
-                field: 'status',
-                type: 'string',
+                field: 'isPublic',
+                type: 'actions',
                 headerName: 'Status',
+                getActions: (params) => {
+                    return(
+                        [
+                            <Tag color={params.row.isPublic === 'Public' 
+                            ? "success" : "processing"
+                        }>{params.row.isPublic}</Tag>
+                        ]
+                    )
+                }
             },
             {
                 field: 'actions',
@@ -121,40 +147,33 @@ const ExamPage = () => {
         [deleteUser],
     );
 
-    const fetchQuestionList = async () => {
+
+    const fetchAllExam = async () => {
         try {
-            const response = await getAllQuestions()
+            const response = await getAllExam()
             if (response.status === 200) {
-                setData(response?.data?.question.map(item => {
-                    return (
-                        {
-                            ...item,
-                            explanation: undefined,
-                            choices: undefined,
-                            id: item._id,
-                            _id: undefined
-                        }
-                    )
-                }))
+                setData(response.data.exam.map(item => ({
+                    ...item,
+                    id: item._id
+                })))
             }
         } catch (error) {
-            alert(error)
+
         }
     }
     useEffect(() => {
         (async () => {
-            // await fetchQuestionList()
-            setData(examList)
+            await fetchAllExam()
         })()
     }, []);
 
-
-
     return (
         <>
-            <ModalAddNewExam
-                fetchQuestionList={fetchQuestionList}
-                show={show} handleClose={handleClose} item={currentQuestion} />
+            <ModalConfirmDelete
+                handleSubmit={handleDeleteExam}
+                handleClose={() => dispatch(toggleShowModal({ show: false }))}
+                {...modalConfirmDelete}
+            />
             <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4">
                 <div className="d-block mb-4 mb-md-0">
                     <Breadcrumb

@@ -1,25 +1,37 @@
 
-import React, { useState } from "react";
-import { useSelector } from 'react-redux'
+import { faBell, faSearch, faSignOutAlt } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBell, faCog, faEnvelopeOpen, faSearch, faSignOutAlt, faUserShield } from "@fortawesome/free-solid-svg-icons";
-import { faUserCircle } from "@fortawesome/free-regular-svg-icons";
-import { Row, Col, Nav, Form, Image, Navbar, Dropdown, Container, ListGroup, InputGroup } from '@themesberg/react-bootstrap';
-
+import { Col, Container, Dropdown, Form, Image, InputGroup, ListGroup, Nav, Navbar, Row } from '@themesberg/react-bootstrap';
+import configuration from "configuration";
+import React, { useState } from "react";
+import { useDispatch, useSelector } from 'react-redux';
+import { useHistory } from "react-router-dom";
+import { updateUser } from "store/userReducer";
 import NOTIFICATIONS_DATA from "../../data/notifications";
 import Profile3 from "../assets/img/team/profile-picture-3.jpg";
 
 const NavBar = (props) => {
   const [notifications, setNotifications] = useState(NOTIFICATIONS_DATA);
   const areNotificationsRead = notifications.reduce((acc, notif) => acc && notif.read, true);
-  const user = useSelector(state => state.user)
+  const user = useSelector(state => state.persist.user.user)
 
-  console.log(user);
+  const dispatch =  useDispatch()
+  const history = useHistory()
   const markNotificationsAsRead = () => {
     setTimeout(() => {
       setNotifications(notifications.map(n => ({ ...n, read: true })));
     }, 300);
   };
+
+  const handleLogout = async() => {
+    try {
+      configuration.removeApiRequestToken()
+      dispatch(updateUser(''))
+      history.replace('/login')
+    } catch (error) {
+      
+    }
+  }
 
 
   const Notification = (props) => {
@@ -89,12 +101,12 @@ const NavBar = (props) => {
                 <div className="media d-flex align-items-center">
                   <Image src={Profile3} className="user-avatar md-avatar rounded-circle" />
                   <div className="media-body ms-2 text-dark align-items-center d-none d-lg-block">
-                    <span className="mb-0 font-small fw-bold">Bonnie Green</span>
+                    <span className="mb-0 font-small fw-bold">{user?.name}</span>
                   </div>
                 </div>
               </Dropdown.Toggle>
               <Dropdown.Menu className="user-dropdown dropdown-menu-right mt-2">
-                <Dropdown.Item className="fw-bold">
+                {/* <Dropdown.Item className="fw-bold">
                   <FontAwesomeIcon icon={faUserCircle} className="me-2" /> My Profile
                 </Dropdown.Item>
                 <Dropdown.Item className="fw-bold">
@@ -107,9 +119,11 @@ const NavBar = (props) => {
                   <FontAwesomeIcon icon={faUserShield} className="me-2" /> Support
                 </Dropdown.Item>
 
-                <Dropdown.Divider />
+                <Dropdown.Divider /> */}
 
-                <Dropdown.Item className="fw-bold">
+                <Dropdown.Item 
+                onClick={handleLogout}
+                className="fw-bold">
                   <FontAwesomeIcon icon={faSignOutAlt} className="text-danger me-2" /> Logout
                 </Dropdown.Item>
               </Dropdown.Menu>

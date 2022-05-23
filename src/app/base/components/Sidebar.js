@@ -10,6 +10,11 @@ import {
   faSignOutAlt,
   faTimes,
   faInbox,
+  faBoxOpen,
+  faUsers,
+  faMoneyCheck,
+  faBookOpen,
+  faQuestion
 } from "@fortawesome/free-solid-svg-icons";
 import {
   Nav,
@@ -169,7 +174,6 @@ const Sidebar = () => {
               </Nav.Link>
             </div>
             <Nav className="flex-column pt-3 pt-md-0">
-
               <NavItem
                 title="Overview"
                 link={Routes.DashboardPage.path}
@@ -178,21 +182,38 @@ const Sidebar = () => {
               <NavItem
                 title="User Management"
                 link="https://demo.themesberg.com/volt-pro-react/#/messages"
-                icon={faInbox}
+                icon={faUsers}
               />
-              <NavItem
-                title={Routes.ModulePage.name}
-                icon={faHandHoldingUsd}
-                link={Routes.ModulePage.path}
-              />
+              <CollapsableNavItem
+                eventKey="content/"
+                title="Content Management"
+                icon={faMoneyCheck}
+              >
+                <NavItem
+                  title={Routes.ModulePage.name}
+                  icon={faMoneyCheck}
+                  link={Routes.ModulePage.path}
+                />
+                <NavItem
+                  title={Routes.ModulePage.name}
+                  icon={faHandHoldingUsd}
+                  link={Routes.ModulePage.path}
+                />
+                <NavItem
+                  title={Routes.LessonsPage.name}
+                  icon={faHandHoldingUsd}
+                  link={Routes.LessonsPage.path}
+                />
+              </CollapsableNavItem>
+
               <NavItem
                 title={Routes.ExamPage.name}
-                icon={faCog}
+                icon={faBookOpen}
                 link={Routes.ExamPage.path}
               />
               <NavItem
                 title={Routes.QuestionPage.name}
-                icon={faCog}
+                icon={faQuestion}
                 link={Routes.QuestionPage.path}
               />
               {/* <NavItem external title="Calendar" link="https://demo.themesberg.com/volt-pro-react/#/calendar" target="_blank" badgeText="Pro" icon={faCalendarAlt} />

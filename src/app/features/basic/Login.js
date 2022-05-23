@@ -21,28 +21,31 @@ const schema = Yup.object().shape({
   password: Yup.string().required('Password is required')
 })
 
-const LoginPage = () => 
-{
+const LoginPage = () => {
   const dispatch = useDispatch();
   const history = useHistory();
   const location = useLocation()
 
-  const SignIn = async(values) => {
+  const SignIn = async (values) => {
     const result = await login({
       email: values.username,
       password: values.password
     })
 
-    if(result.status === 200)
-    {
+    if (result.status === 200) {
       //set token
       configuration.setApiRequestToken(result.data.tokens)
-      dispatch(updateUser(result.data))
-      history.push(`${location.state.from}${location.state.search}`)
+      dispatch(updateUser(result.data.user))
+      if (location?.state?.from === undefined) {
+        history.push('/')
+      }
+      else {
+        history.push(`${location.state.from}${location.state.search}`)
+      }
     }
   }
 
-  return(
+  return (
     <main>
       <section className="d-flex align-items-center my-5 mt-lg-6 mb-lg-5">
         <Container>
@@ -72,52 +75,52 @@ const LoginPage = () =>
                       handleBlur,
                       handleSubmit
                     } = props;
-  
+
                     return (
                       <Form className="mt-4 basic-form" noValidate onSubmit={handleSubmit}>
                         <Form.Group id="username" className="mb-4">
                           <Form.Label>Your Username</Form.Label>
                           <InputGroup
-                          className={errors.username && touched.username && "error"}
+                            className={errors.username && touched.username && "error"}
                           >
                             <InputGroup.Text>
                               <FontAwesomeIcon icon={faEnvelope} />
                             </InputGroup.Text>
-                            <Form.Control 
-                            autoFocus 
-                            type="text" 
-                            placeholder="Username" 
-                            value={values.username}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                            className={errors.username && touched.username && "error"}
-                            name="username"
+                            <Form.Control
+                              autoFocus
+                              type="text"
+                              placeholder="Username"
+                              value={values.username}
+                              onChange={handleChange}
+                              onBlur={handleBlur}
+                              className={errors.username && touched.username && "error"}
+                              name="username"
                             />
-                            
+
                           </InputGroup>
-                          <ErrorMessage name="username" component="div" className="invalid-feedback"/>
+                          <ErrorMessage name="username" component="div" className="invalid-feedback" />
                         </Form.Group>
                         <Form.Group>
                           <Form.Group id="password" className="mb-4">
                             <Form.Label>Your Password</Form.Label>
                             <InputGroup
-                            className={errors.password && touched.password && "error"}
+                              className={errors.password && touched.password && "error"}
                             >
                               <InputGroup.Text>
                                 <FontAwesomeIcon icon={faUnlockAlt} />
                               </InputGroup.Text>
-                              <Form.Control 
-                              name="password"
-                              type="password" 
-                              placeholder="Password" 
-                              value={values.password}
-                              onChange={handleChange}
-                              onBlur={handleBlur}
-                              className={errors.password && touched.password && "error"}
-                              maxLength={16}
+                              <Form.Control
+                                name="password"
+                                type="password"
+                                placeholder="Password"
+                                value={values.password}
+                                onChange={handleChange}
+                                onBlur={handleBlur}
+                                className={errors.password && touched.password && "error"}
+                                maxLength={16}
                               />
                             </InputGroup>
-                            <ErrorMessage name="password" component="div" className="invalid-feedback"/>
+                            <ErrorMessage name="password" component="div" className="invalid-feedback" />
                           </Form.Group>
                           <div className="d-flex justify-content-between align-items-center mb-4">
                             <Form.Check type="checkbox">
@@ -141,5 +144,5 @@ const LoginPage = () =>
     </main>
   );
 }
- 
+
 export default LoginPage;

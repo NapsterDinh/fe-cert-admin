@@ -6,9 +6,7 @@ import { Routes } from "app/routes";
 //pages
 //components
 import PreloaderNoProps from "app/base/components/PreloaderNoProps";
-import RouteWithLoader, {
-  RouteWithSidebar,
-} from "app/base/utils/routeConfig";
+import RouteWithLoader, { RouteWithSidebar } from "app/base/utils/routeConfig";
 import NotFound from "../basic/NotFound";
 import LockPage from "../basic/Lock";
 import ServerError from "../basic/ServerError";
@@ -71,9 +69,29 @@ const HomePage = () => (
         component={Routes.NewExamPage.element}
       />
 
+      <RouteWithSidebar
+        exact={Routes.LessonsPage.exact}
+        path={Routes.LessonsPage.path}
+        component={Routes.LessonsPage.element}
+      />
+
+      <RouteWithSidebar
+        exact={Routes.AddNewLessonsPage.exact}
+        path={Routes.AddNewLessonsPage.path}
+        component={Routes.AddNewLessonsPage.element}
+      />
+
       <Route component={NotFound} />
-      <Route exact={Routes.LockPage.exact} path={Routes.LockPage.path} component={LockPage} />
-      <Route exact={Routes.ServerErrorPage.exact} path={Routes.ServerErrorPage.path} component={ServerError} />
+      <Route
+        exact={Routes.LockPage.exact}
+        path={Routes.LockPage.path}
+        component={LockPage}
+      />
+      <Route
+        exact={Routes.ServerErrorPage.exact}
+        path={Routes.ServerErrorPage.path}
+        component={ServerError}
+      />
     </Switch>
   </Suspense>
 );

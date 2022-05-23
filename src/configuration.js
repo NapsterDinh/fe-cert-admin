@@ -3,6 +3,9 @@ const configuration = {
   setApiRequestToken: (token) => {
     localStorage.setItem('requestToken', JSON.stringify(token))
   },
+  removeApiRequestToken: (token) => {
+    localStorage.removeItem('requestToken')
+  },
   getAPIRequestToken: () => {
     return JSON.parse(localStorage.getItem('requestToken'))
   }

@@ -2,7 +2,7 @@ import React from 'react'
 import { BrowserRouter } from "react-router-dom"
 //core-styles
 import 'app/scss/volt.scss'
-
+import 'antd/dist/antd.css';
 //Pages
 import HomePage from 'app/features/HomePage/HomePage'
 

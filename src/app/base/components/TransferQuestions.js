@@ -86,7 +86,6 @@ const rightTableColumns = [
 ];
 
 const TransferQuestions = ({ data, questions, setQuestions }) => {
-
     const handleOnChange = (nextTargetKeys, direction, moveKeys) => {
         setQuestions(nextTargetKeys)
     };
@@ -99,7 +98,7 @@ const TransferQuestions = ({ data, questions, setQuestions }) => {
                 showSearch
                 onChange={handleOnChange}
                 filterOption={(inputValue, item) =>
-                    item.id.indexOf(inputValue) !== -1 || item.question.indexOf(inputValue) !== -1
+                    item.key.indexOf(inputValue) !== -1 || item.question.indexOf(inputValue) !== -1
                 }
                 leftColumns={leftTableColumns}
                 rightColumns={rightTableColumns}

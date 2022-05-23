@@ -12,6 +12,17 @@ export const TablesQuestion = ({ data, title, handleShow }) => {
         <div style={{ height: 632, width: '100%' }}>
           <DataGrid
             sx={{
+              '.MuiDataGrid-actionsCell': {
+                width: '100%;'
+              },
+              '.MuiDataGrid-columnHeaderTitle.css-1jbbcbn-MuiDataGrid-columnHeaderTitle': {
+                fontWeight: '700;'
+              },
+              '.MuiDataGrid-actionsCell span': {
+                width: '100%;',
+                overflow: 'hidden;',
+                textOverflow: 'ellipsis;'
+              },
               '.css-1s0hp0k-MuiDataGrid-columnHeadersInner': {
                 width: '100%'
               },
