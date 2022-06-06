@@ -27,8 +27,14 @@ import("app/features/QuestionPage/QuestionPage")
 const ExamPage = React.lazy(() =>
 import("app/features/ExamPage/ExamPage")
 );
+const SectionPage = React.lazy(() =>
+import("app/features/SectionPage/SectionPage")
+);
 const NewExamPage = React.lazy(() =>
 import("app/features/ExamPage/NewExamPage/NewExamPage")
+);
+const NewSectionPage = React.lazy(() =>
+import("app/features/SectionPage/NewSectionPage/NewSectionPage")
 );
 
 const LessonsPage = React.lazy(() =>
@@ -88,11 +94,23 @@ export const Routes = {
     name: "Exam Management",
     element: ExamPage,
   },
+  SectionPage: {
+    path: "/section-management",
+    exact: true,
+    name: "Section Management",
+    element: SectionPage,
+  },
   NewExamPage: {
     path: ["/exam-management/add", "/exam-management/:idExam"],
     exact: true,
     name: "Create a new exam",
     element: NewExamPage,
+  },
+  NewSectionPage: {
+    path: ["/section-management/add", "/section-management/:idSection"],
+    exact: true,
+    name: "Create a new section",
+    element: NewSectionPage,
   },
   LessonsPage: {
     path: "/lessons-management",

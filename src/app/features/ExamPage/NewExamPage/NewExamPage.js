@@ -19,6 +19,7 @@ import TransferQuestions from "app/base/components/TransferQuestions";
 import { addNewExam, editExam } from "app/core/apis/exam";
 import { getAllQuestions } from "app/core/apis/question";
 import { defaultExamContent } from "app/data/exam";
+import Editor from 'app/base/components/Editor/Editor'
 //data
 import { Routes } from "app/routes";
 import React, { useEffect, useState } from "react";
@@ -32,7 +33,10 @@ const NewExamPage = () => {
   const [show, setShow] = useState(false);
   const [questions, setQuestions] = useState("");
   const [questionData, setQuestionData] = useState([]);
-  const [dateEvent, setDateEvent] = useState(new Date().toISOString().substring(0, 10));
+  const [dateEvent, setDateEvent] = useState(
+    new Date().toISOString().substring(0, 10)
+  );
+  const [ content, setContent ] =  useState("")
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
 
@@ -43,7 +47,7 @@ const NewExamPage = () => {
       description: e.target.description.value.trim(),
       slug: e.target.description.value.trim(),
       time: e.target.time.value.trim(),
-      content: e.target.content.value.trim(),
+      content: content,
       isPublic: e.target.isPublic[0].checked ? "Public" : "Private",
       isSessionMorning: e.target.isSessionMorning[0].checked,
       eventDate: new Date(dateEvent).toISOString(),
@@ -74,21 +78,21 @@ const NewExamPage = () => {
       //submit
       try {
         if (idExam === undefined) {
-          let test = exam.questions
-          test.splice(test.length - 1, 1)
+          let test = exam.questions;
+          test.splice(test.length - 1, 1);
           await addNewExam({
             ...exam,
-            questions: test
+            questions: test,
           });
         } else {
           await editExam({
             ...exam,
-            _id: idExam
+            _id: idExam,
           });
         }
         window.location = "/exam-management";
         openNotificationWithIcon("success", "A new exam has been created");
-      } catch (error) { }
+      } catch (error) {}
     }
   };
 
@@ -106,7 +110,12 @@ const NewExamPage = () => {
             setQuestions(
               response1?.data?.exam?.exam[0].questions.map((item) => item._id)
             );
-            setDateEvent(new Date(response1?.data?.exam?.exam[0]?.eventDate).toISOString().substring(0, 10))
+            setContent(response1?.data?.exam?.exam[0]?.content)
+            setDateEvent(
+              new Date(response1?.data?.exam?.exam[0]?.eventDate)
+                .toISOString()
+                .substring(0, 10)
+            );
           }
         }
       } catch (error) {
@@ -173,269 +182,8 @@ const NewExamPage = () => {
             border="light"
             className="table-wrapper table-responsive shadow-sm"
           >
-            {
-              data?.title !== undefined
-                ?
-                <Card.Body className="pt-0 my-4">
-                  <Row>
-                    <Col lg={7}>
-                      <Form.Group
-                        className={"form-group mb-3"}
-                        as={Col}
-                        controlId="formTitle"
-                      >
-                        <Form.Label>Title</Form.Label>
-                        <InputGroup>
-                          <Form.Control
-                            defaultValue={data?.title}
-                            name="title"
-                            type="text"
-                          />
-                        </InputGroup>
-                      </Form.Group>
-                      <Form.Group
-                        className={"form-group error mb-3"}
-                        controlId="formDescription"
-                      >
-                        <Form.Label>Description</Form.Label>
-                        <InputGroup>
-                          <Form.Control
-                            defaultValue={data?.description}
-                            name="description"
-                            as="textarea"
-                            rows={5}
-                          />
-                        </InputGroup>
-                      </Form.Group>
-                      <Form.Group
-                        className={"form-group error mb-3"}
-                        controlId="formContent"
-                      >
-                        <Form.Label>Content</Form.Label>
-                        <InputGroup>
-                          <Form.Control
-                            name="content"
-                            defaultValue={data?.content}
-                            as="textarea"
-                            rows={10}
-                          />
-                        </InputGroup>
-                      </Form.Group>
-                      <div className="d-flex justify-content-between">
-                        <Form.Group
-                          style={{ flex: "0 0 40%" }}
-                          className="mb-3"
-                          controlId="formDescription"
-                        >
-                          <Form.Label>Topic</Form.Label>
-                          <Form.Select aria-label="Default select example">
-                            <option>Open this select menu</option>
-                            <option value="1">One</option>
-                            <option value="2">Two</option>
-                            <option value="3">Three</option>
-                          </Form.Select>
-                        </Form.Group>
-                        <Form.Group
-                          style={{ flex: "0 0 40%" }}
-                          className="mb-3"
-                          controlId="formDescription"
-                        >
-                          <Form.Label>Exam</Form.Label>
-                          <Form.Select aria-label="Default select example">
-                            <option>Open this select menu</option>
-                            <option value="1">One</option>
-                            <option value="2">Two</option>
-                            <option value="3">Three</option>
-                          </Form.Select>
-                        </Form.Group>
-                      </div>
-                    </Col>
-                    <Col lg={4} className="mx-5">
-                      <Form.Group
-                        className={"form-group mb-3 d-flex"}
-                        as={Col}
-                        controlId="formTitle"
-                      >
-                        <div>
-                          <Form.Label>Time(s)</Form.Label>
-                          <InputGroup>
-                            <Form.Control
-                              name="time"
-                              defaultValue={data?.time}
-                              type="text"
-                            />
-                          </InputGroup>
-                        </div>
-
-                        <div className="mx-4">
-                          <Form.Label>Total Questions</Form.Label>
-                          <InputGroup>
-                            <Form.Control
-                              name="totalQuestions"
-                              defaultValue={data?.totalQuestions}
-                              type="text"
-                            />
-                          </InputGroup>
-                        </div>
-                      </Form.Group>
-                      <Form.Group
-                        className={"form-group mb-3 d-flex"}
-                        as={Col}
-                        controlId="formTitle"
-                      >
-                        <div>
-                          <Form.Label>Session</Form.Label>
-                          <div key={`inline-radio`} className="mb-3">
-                            <Form.Check
-                              inline
-                              label="Morning"
-                              name="isSessionMorning"
-                              defaultChecked={data?.isSessionMorning}
-                              type="radio"
-                              id={`inline-radio-9`}
-                            />
-                            <Form.Check
-                              inline
-                              label="Afternoon"
-                              name="isSessionMorning"
-                              defaultChecked={!data?.isSessionMorning}
-                              type="radio"
-                              id={`inline-radio-10`}
-                            />
-                          </div>
-                        </div>
-                      </Form.Group>
-                      <Form.Group
-                        className={"form-group mb-3 d-flex"}
-                        as={Col}
-                        controlId="formTitle"
-                      >
-                        <div className="mr-3">
-                          <Form.Label>Event Location</Form.Label>
-                          <InputGroup>
-                            <Form.Control
-                              defaultValue={data?.location}
-                              name="location"
-                              type="text"
-                            />
-                          </InputGroup>
-                        </div>
-
-                        <div className="mx-4">
-                          <Form.Label>Event date</Form.Label>
-                          <InputGroup>
-                            <Form.Control
-                              value={dateEvent}
-                              onChange={(e) => {
-                                setDateEvent(e.target.value)
-                              }}
-                              name="eventDate"
-                              type="date"
-                            />
-                          </InputGroup>
-                        </div>
-                      </Form.Group>
-                      <Form.Group
-                        className={"form-group mb-3 d-flex"}
-                        as={Col}
-                        controlId="formTitle"
-                      >
-                        <div className="mr-3">
-                          <Form.Label>Max total test per user</Form.Label>
-                          <InputGroup>
-                            <Form.Control
-                              name="maxTotalTests"
-                              defaultValue={
-                                data?.maxTotalTests
-                              }
-                              type="text"
-                            />
-                          </InputGroup>
-                        </div>
-                      </Form.Group>
-                      <Form.Group
-                        className={"form-group mb-3 d-flex mt-3"}
-                        as={Col}
-                        controlId="formTitle"
-                      >
-                        <div key={`inline-checkbox1`} className="mb-3">
-                          <Form.Check
-                            inline
-                            label="Show right Answer"
-                            name="hasShowRightAnswer"
-                            defaultChecked={data?.hasShowRightAnswer}
-                            type="checkbox"
-                            id={`inline-radio-1`}
-                          />
-                        </div>
-                        <div key={`inline-checkbox2`} className="mb-3">
-                          <Form.Check
-                            inline
-                            label="Show explanation"
-                            name="hasShowExplanation"
-                            defaultChecked={data?.hasShowExplanation}
-                            type="checkbox"
-                            id={`inline-radio-11`}
-                          />
-                        </div>
-                        <div key={`inline-checkbox3`} className="mb-3">
-                          <Form.Check
-                            inline
-                            label="Show Ranking"
-                            defaultChecked={data?.showRanking}
-                            name="showRanking"
-                            type="checkbox"
-                            id={`inline-radio-13`}
-                          />
-                        </div>
-                      </Form.Group>
-                      <Form.Group
-                        className={"form-group mb-3 d-flex"}
-                        as={Col}
-                        controlId="formTitle"
-                      >
-                        <div>
-                          <Form.Label>Status</Form.Label>
-                          <div key={`inline-radio-status`} className="mb-3">
-                            <Form.Check
-                              inline
-                              label="Public"
-                              name="isPublic"
-                              defaultChecked={data.isPublic !== 'Public'}
-                              type="radio"
-                              id={`inline-radio-3`}
-                            />
-                            <Form.Check
-                              inline
-                              name="isPublic"
-                              label="Private"
-                              defaultChecked={data.isPublic !== 'Public'}
-                              type="radio"
-                              id={`inline-radio-4`}
-                            />
-                          </div>
-                        </div>
-                      </Form.Group>
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Form.Group className="mb-3" controlId="formDescription">
-                      <Form.Label>Question List</Form.Label>
-                      {questionData !== "" && (
-                        <TransferQuestions
-                          questions={questions}
-                          setQuestions={setQuestions}
-                          data={questionData.map((item) => ({
-                            ...item,
-                            key: item._id,
-                          }))}
-                        />
-                      )}
-                    </Form.Group>
-                  </Row>
-                </Card.Body>
-                : 
-                <Card.Body className="pt-0 my-4">
+            {data?.title !== undefined ? (
+              <Card.Body className="pt-0 my-4">
                 <Row>
                   <Col lg={7}>
                     <Form.Group
@@ -446,9 +194,257 @@ const NewExamPage = () => {
                       <Form.Label>Title</Form.Label>
                       <InputGroup>
                         <Form.Control
+                          defaultValue={data?.title}
                           name="title"
                           type="text"
                         />
+                      </InputGroup>
+                    </Form.Group>
+                    <Form.Group
+                      className={"form-group error mb-3"}
+                      controlId="formDescription"
+                    >
+                      <Form.Label>Description</Form.Label>
+                      <InputGroup>
+                        <Form.Control
+                          defaultValue={data?.description}
+                          name="description"
+                          as="textarea"
+                          rows={5}
+                        />
+                      </InputGroup>
+                    </Form.Group>
+                    <Form.Group className="mb-3" as={Col} controlId="formTitle">
+                      <Form.Label>Content</Form.Label>
+                      <Editor
+                        state={content}
+                        setState={setContent}
+                        placeholder={"Enter content"}
+                      />
+                    </Form.Group>
+                    <div className="d-flex justify-content-between">
+                      <Form.Group
+                        style={{ flex: "0 0 40%" }}
+                        className="mb-3"
+                        controlId="formDescription"
+                      >
+                        <Form.Label>Topic</Form.Label>
+                        <Form.Select aria-label="Default select example">
+                          <option>Open this select menu</option>
+                          <option value="1">One</option>
+                          <option value="2">Two</option>
+                          <option value="3">Three</option>
+                        </Form.Select>
+                      </Form.Group>
+                      <Form.Group
+                        style={{ flex: "0 0 40%" }}
+                        className="mb-3"
+                        controlId="formDescription"
+                      >
+                        <Form.Label>Exam</Form.Label>
+                        <Form.Select aria-label="Default select example">
+                          <option>Open this select menu</option>
+                          <option value="1">One</option>
+                          <option value="2">Two</option>
+                          <option value="3">Three</option>
+                        </Form.Select>
+                      </Form.Group>
+                    </div>
+                  </Col>
+                  <Col lg={4} className="mx-5">
+                    <Form.Group
+                      className={"form-group mb-3 d-flex"}
+                      as={Col}
+                      controlId="formTitle"
+                    >
+                      <div>
+                        <Form.Label>Time(s)</Form.Label>
+                        <InputGroup>
+                          <Form.Control
+                            name="time"
+                            defaultValue={data?.time}
+                            type="text"
+                          />
+                        </InputGroup>
+                      </div>
+
+                      <div className="mx-4">
+                        <Form.Label>Total Questions</Form.Label>
+                        <InputGroup>
+                          <Form.Control
+                            name="totalQuestions"
+                            defaultValue={data?.totalQuestions}
+                            type="text"
+                          />
+                        </InputGroup>
+                      </div>
+                    </Form.Group>
+                    <Form.Group
+                      className={"form-group mb-3 d-flex"}
+                      as={Col}
+                      controlId="formTitle"
+                    >
+                      <div>
+                        <Form.Label>Session</Form.Label>
+                        <div key={`inline-radio`} className="mb-3">
+                          <Form.Check
+                            inline
+                            label="Morning"
+                            name="isSessionMorning"
+                            defaultChecked={data?.isSessionMorning}
+                            type="radio"
+                            id={`inline-radio-9`}
+                          />
+                          <Form.Check
+                            inline
+                            label="Afternoon"
+                            name="isSessionMorning"
+                            defaultChecked={!data?.isSessionMorning}
+                            type="radio"
+                            id={`inline-radio-10`}
+                          />
+                        </div>
+                      </div>
+                    </Form.Group>
+                    <Form.Group
+                      className={"form-group mb-3 d-flex"}
+                      as={Col}
+                      controlId="formTitle"
+                    >
+                      <div className="mr-3">
+                        <Form.Label>Event Location</Form.Label>
+                        <InputGroup>
+                          <Form.Control
+                            defaultValue={data?.location}
+                            name="location"
+                            type="text"
+                          />
+                        </InputGroup>
+                      </div>
+
+                      <div className="mx-4">
+                        <Form.Label>Event date</Form.Label>
+                        <InputGroup>
+                          <Form.Control
+                            value={dateEvent}
+                            onChange={(e) => {
+                              setDateEvent(e.target.value);
+                            }}
+                            name="eventDate"
+                            type="date"
+                          />
+                        </InputGroup>
+                      </div>
+                    </Form.Group>
+                    <Form.Group
+                      className={"form-group mb-3 d-flex"}
+                      as={Col}
+                      controlId="formTitle"
+                    >
+                      <div className="mr-3">
+                        <Form.Label>Max total test per user</Form.Label>
+                        <InputGroup>
+                          <Form.Control
+                            name="maxTotalTests"
+                            defaultValue={data?.maxTotalTests}
+                            type="text"
+                          />
+                        </InputGroup>
+                      </div>
+                    </Form.Group>
+                    <Form.Group
+                      className={"form-group mb-3 d-flex mt-3"}
+                      as={Col}
+                      controlId="formTitle"
+                    >
+                      <div key={`inline-checkbox1`} className="mb-3">
+                        <Form.Check
+                          inline
+                          label="Show right Answer"
+                          name="hasShowRightAnswer"
+                          defaultChecked={data?.hasShowRightAnswer}
+                          type="checkbox"
+                          id={`inline-radio-1`}
+                        />
+                      </div>
+                      <div key={`inline-checkbox2`} className="mb-3">
+                        <Form.Check
+                          inline
+                          label="Show explanation"
+                          name="hasShowExplanation"
+                          defaultChecked={data?.hasShowExplanation}
+                          type="checkbox"
+                          id={`inline-radio-11`}
+                        />
+                      </div>
+                      <div key={`inline-checkbox3`} className="mb-3">
+                        <Form.Check
+                          inline
+                          label="Show Ranking"
+                          defaultChecked={data?.showRanking}
+                          name="showRanking"
+                          type="checkbox"
+                          id={`inline-radio-13`}
+                        />
+                      </div>
+                    </Form.Group>
+                    <Form.Group
+                      className={"form-group mb-3 d-flex"}
+                      as={Col}
+                      controlId="formTitle"
+                    >
+                      <div>
+                        <Form.Label>Status</Form.Label>
+                        <div key={`inline-radio-status`} className="mb-3">
+                          <Form.Check
+                            inline
+                            label="Public"
+                            name="isPublic"
+                            defaultChecked={data.isPublic !== "Public"}
+                            type="radio"
+                            id={`inline-radio-3`}
+                          />
+                          <Form.Check
+                            inline
+                            name="isPublic"
+                            label="Private"
+                            defaultChecked={data.isPublic !== "Public"}
+                            type="radio"
+                            id={`inline-radio-4`}
+                          />
+                        </div>
+                      </div>
+                    </Form.Group>
+                  </Col>
+                </Row>
+                <Row>
+                  <Form.Group className="mb-3" controlId="formDescription">
+                    <Form.Label>Question List</Form.Label>
+                    {questionData !== "" && (
+                      <TransferQuestions
+                        questions={questions}
+                        setQuestions={setQuestions}
+                        data={questionData.map((item) => ({
+                          ...item,
+                          key: item._id,
+                        }))}
+                      />
+                    )}
+                  </Form.Group>
+                </Row>
+              </Card.Body>
+            ) : (
+              <Card.Body className="pt-0 my-4">
+                <Row>
+                  <Col lg={7}>
+                    <Form.Group
+                      className={"form-group mb-3"}
+                      as={Col}
+                      controlId="formTitle"
+                    >
+                      <Form.Label>Title</Form.Label>
+                      <InputGroup>
+                        <Form.Control name="title" type="text" />
                       </InputGroup>
                     </Form.Group>
                     <Form.Group
@@ -472,9 +468,7 @@ const NewExamPage = () => {
                       <InputGroup>
                         <Form.Control
                           name="content"
-                          defaultValue={
-                            defaultExamContent
-                          }
+                          defaultValue={defaultExamContent}
                           as="textarea"
                           rows={10}
                         />
@@ -525,15 +519,13 @@ const NewExamPage = () => {
                           />
                         </InputGroup>
                       </div>
-  
+
                       <div className="mx-4">
                         <Form.Label>Total Questions</Form.Label>
                         <InputGroup>
                           <Form.Control
                             name="totalQuestions"
-                            defaultValue={
-                              80
-                            }
+                            defaultValue={80}
                             type="text"
                           />
                         </InputGroup>
@@ -573,20 +565,17 @@ const NewExamPage = () => {
                       <div className="mr-3">
                         <Form.Label>Event Location</Form.Label>
                         <InputGroup>
-                          <Form.Control
-                            name="location"
-                            type="text"
-                          />
+                          <Form.Control name="location" type="text" />
                         </InputGroup>
                       </div>
-  
+
                       <div className="mx-4">
                         <Form.Label>Event date</Form.Label>
                         <InputGroup>
                           <Form.Control
                             value={dateEvent}
                             onChange={(e) => {
-                              setDateEvent(e.target.value)
+                              setDateEvent(e.target.value);
                             }}
                             name="eventDate"
                             type="date"
@@ -604,9 +593,7 @@ const NewExamPage = () => {
                         <InputGroup>
                           <Form.Control
                             name="maxTotalTests"
-                            defaultValue={
-                              100
-                            }
+                            defaultValue={100}
                             type="text"
                           />
                         </InputGroup>
@@ -622,7 +609,6 @@ const NewExamPage = () => {
                           inline
                           label="Show right Answer"
                           name="hasShowRightAnswer"
-                          defaultChecked
                           type="checkbox"
                           id={`inline-radio-1`}
                         />
@@ -632,7 +618,6 @@ const NewExamPage = () => {
                           inline
                           label="Show explanation"
                           name="hasShowExplanation"
-                          defaultChecked
                           type="checkbox"
                           id={`inline-radio-11`}
                         />
@@ -641,7 +626,6 @@ const NewExamPage = () => {
                         <Form.Check
                           inline
                           label="Show Ranking"
-                          defaultChecked
                           name="showRanking"
                           type="checkbox"
                           id={`inline-radio-13`}
@@ -692,8 +676,7 @@ const NewExamPage = () => {
                   </Form.Group>
                 </Row>
               </Card.Body>
-            }
-
+            )}
           </Card>
         </div>
       </Form>

@@ -10,7 +10,10 @@ import { addNewQuestion, editQuestion } from "app/core/apis/question";
 import React, { useState, useEffect } from "react";
 import { openNotificationWithIcon } from "app/base/components/Notification";
 import { getAllTopic } from "app/core/apis/topic";
+import { Select } from "antd";
+import Editor from "app/base/components/Editor/Editor";
 import "./ModalNewQuestion.css";
+const { Option } = Select;
 
 const ModalAddNewQuestion = ({
   show,
@@ -20,21 +23,32 @@ const ModalAddNewQuestion = ({
   fetchQuestionList,
 }) => {
   const [topic, setTopic] = useState([]);
+  const [selectedTopicID, setSelectedTopicID] = useState("");
+  const [question, setQuestion] = useState("");
+  const [explanation, setExplanation] = useState("");
+
+  console.log(item);
+
+  useEffect(() => {
+    if(item !== "")
+    {
+      setQuestion(item.question)
+      setExplanation(item.explanation)
+    }
+    else
+    {
+      setQuestion("")
+      setExplanation("")
+    }
+  }, [item])
+
   const handleAddNewQuestion = async (e) => {
     e.preventDefault();
     const tempItem = item;
     setItem("");
-    const question = e.target.question.value.trim();
-    const explanation = e.target.explanation.value.trim();
     const type = "single_choice";
     let choices = [];
     let answer = "";
-    let topicId = ""
-
-    if(e.target.topic.value !== -1)
-    {
-      topicId =topic[e.target.topic.value]._id
-    }
 
     if (tempItem?.question !== undefined) {
       try {
@@ -71,7 +85,7 @@ const ModalAddNewQuestion = ({
           type: type,
           choices: choices,
           answer: answer,
-          topicId
+          topic: topic?.find((t) => t.title === selectedTopicID)._id,
         });
         if (response.status === 201) {
           await fetchQuestionList();
@@ -114,7 +128,7 @@ const ModalAddNewQuestion = ({
           type: type,
           choices: choices,
           answer: answer,
-          topicId
+          topic: topic?.find((t) => t.title === selectedTopicID)._id,
         });
 
         if (response.status === 201) {
@@ -127,6 +141,10 @@ const ModalAddNewQuestion = ({
         }
       } catch (error) {}
     }
+  };
+
+  const handleChange = (value) => {
+    setSelectedTopicID(value);
   };
 
   useEffect(() => {
@@ -161,15 +179,11 @@ const ModalAddNewQuestion = ({
                   controlId="formTitle"
                 >
                   <Form.Label>Question</Form.Label>
-                  <InputGroup>
-                    <Form.Control
-                      defaultValue={item?.question}
-                      as="textarea"
-                      name="question"
-                      rows={3}
-                      placeholder="Enter question"
-                    />
-                  </InputGroup>
+                  <Editor
+                    state={question}
+                    setState={setQuestion}
+                    placeholder="Enter question"
+                  />
                 </Form.Group>
                 <Form.Group
                   className={"form-group error mb-3"}
@@ -178,9 +192,9 @@ const ModalAddNewQuestion = ({
                   <Form.Label>Explanation(Optional)</Form.Label>
                   <InputGroup>
                     <Form.Control
-                      defaultValue={item?.explanation}
                       as="textarea"
-                      name="explanation"
+                      value={explanation}
+                      onChange={(e) => setExplanation(e.target.value)}
                       rows={3}
                       placeholder="Enter explanation"
                     />
@@ -283,21 +297,20 @@ const ModalAddNewQuestion = ({
               <Col lg={4}>
                 <Form.Group className="mb-3" controlId="formDescription">
                   <Form.Label>Topic</Form.Label>
-                  <Form.Select aria-label="Default select example" name="topic">
-                    <option value={-1}>Select topic</option>
-                    {topic?.map((item, index) => (
-                      <option key={item._id} value={index}>{item.title}</option>
+                  <Select
+                    style={{ width: "300px" }}
+                    defaultValue={
+                      item !== "" &&
+                      topic?.find((t) => t._id === item.topic)?.title
+                    }
+                    onChange={handleChange}
+                  >
+                    {topic?.map((t) => (
+                      <Option key={t._id} value={t.title}>
+                        {t.title}
+                      </Option>
                     ))}
-                  </Form.Select>
-                </Form.Group>
-                <Form.Group className="mb-3" controlId="formDescription">
-                  <Form.Label>Exam</Form.Label>
-                  <Form.Select aria-label="Default select example">
-                    <option>Open this select menu</option>
-                    <option value="1">One</option>
-                    <option value="2">Two</option>
-                    <option value="3">Three</option>
-                  </Form.Select>
+                  </Select>
                 </Form.Group>
               </Col>
             </Row>

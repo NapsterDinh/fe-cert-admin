@@ -13,7 +13,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 //components
 import Actions from "app/base/components/Actions";
-import { ModalTutorial } from "app/base/components/Modal";
+import { ModalTutorial } from "app/base/components/Modal/Modal";
 //data
 import { Routes } from "app/routes";
 import { titleModule } from "app/data/titleTable";

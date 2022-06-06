@@ -68,54 +68,6 @@ const AddNewLessonPage = ({ placeholder }) => {
           </Button>
         </div>
       </div>
-      <Row>
-        <Col lg={9}>
-          <Form.Group className="mb-3" controlId="tutorialTitle">
-            <Form.Label>Title</Form.Label>
-            <Form.Control
-              maxLength={130}
-              minLength={20}
-              type="text"
-              placeholder="Enter title"
-            />
-          </Form.Group>
-          <Form.Group className="mb-3" controlId="tutorialSlug">
-            <Form.Label>Slug</Form.Label>
-            <Form.Control type="text" placeholder="Slug" />
-          </Form.Group>
-          <Form.Label>Body</Form.Label>
-          <JoditEditor
-            ref={editor}
-            value={content}
-            config={{
-              minHeight: 400,
-              readonly: false,
-            }}
-            tabIndex={1} // tabIndex of textarea
-            onBlur={(newContent) => setContent(newContent)} // preferred to use only this option to update the content for performance reasons
-            onChange={(newContent) => {}}
-          />
-          <Form.Group className="mb-3 mt-3" controlId="tutorialDescription">
-            <Form.Label>Description</Form.Label>
-            <Form.Control as="textarea" placeholder="Enter description" />
-          </Form.Group>
-        </Col>
-        <Col lg={3}>
-          <Card className="mt-4" style={{ width: "18rem" }}>
-            <Card.Body>
-              <Card.Text>
-                Status: <span>Done</span>
-              </Card.Text>
-              <Card.Text>
-                Date Created: <span>ngaynaodo</span>
-              </Card.Text>
-              <Card.Text>
-                Last date changed: <span>ngaynaodo</span>
-              </Card.Text>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
     </>
   );
 };

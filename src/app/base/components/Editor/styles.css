@@ -1,0 +1,13 @@
+.text-editor {
+  margin: 0 auto;
+}
+.ql-toolbar.ql-snow {
+  display: flex;
+  flex-wrap: wrap;
+}
+.ql-toolbar.ql-snow .ql-formats {
+  display: block;
+}
+.ql-editor {
+  min-height: 100px;
+}

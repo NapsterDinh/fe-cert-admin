@@ -168,7 +168,7 @@
 
 .sidebar-inner {
 	position: relative;
-	overflow-y: hidden;
+	overflow: hidden;
 	padding-left: 10px!important;
 	.accordion-button{
 		&::after {

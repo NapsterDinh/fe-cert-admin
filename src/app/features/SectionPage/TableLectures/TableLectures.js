@@ -2,10 +2,10 @@ import React from 'react';
 import { DataGrid } from '@mui/x-data-grid';
 
 import { Card} from '@themesberg/react-bootstrap';
-import './TableExam.css'
+import './TableLectures.css'
 
 
-export const TableExam = ({ data, title, handleShow }) => {
+export const TableLectures = ({ data, title, handleShow, deleteSection }) => {
   const [pageSize, setPageSize] = React.useState(10);
 
   return (
@@ -20,6 +20,11 @@ export const TableExam = ({ data, title, handleShow }) => {
               '.css-1s0hp0k-MuiDataGrid-columnHeadersInner': {
                 width: '100%'
               },
+              ".MuiDataGrid-actionsCell a": {
+                width: "100%;",
+                overflow: "hidden;",
+                textOverflow: "ellipsis;",
+              },
               '.MuiDataGrid-columnHeader': {
                 width: 'auto!important',
                 maxWidth: 'none!important',
@@ -30,16 +35,16 @@ export const TableExam = ({ data, title, handleShow }) => {
                 flexBasis: '5%!important',
               },
               '.MuiDataGrid-columnHeader:nth-of-type(2)': {
-                flexBasis: '20%!important',
+                flexBasis: '10%!important',
               },
               '.MuiDataGrid-columnHeader:nth-of-type(3)': {
                 flexBasis: '15%!important',
               },
               '.MuiDataGrid-columnHeader:nth-of-type(4)': {
-                flexBasis: '25%!important',
+                flexBasis: '30%!important',
               },
               '.MuiDataGrid-columnHeader:nth-of-type(5)': {
-                flexBasis: '10%!important',
+                flexBasis: '20%!important',
               },
               '.MuiDataGrid-columnHeader:nth-of-type(6)': {
                 flexBasis: '10%!important',
@@ -56,16 +61,16 @@ export const TableExam = ({ data, title, handleShow }) => {
                 flexBasis: '5%!important',
               },
               '.MuiDataGrid-row .MuiDataGrid-cell:nth-of-type(2)': {
-                flexBasis: '20%!important',
+                flexBasis: '10%!important',
               },
               '.MuiDataGrid-row .MuiDataGrid-cell:nth-of-type(3)': {
                 flexBasis: '15%!important',
               },
               '.MuiDataGrid-row .MuiDataGrid-cell:nth-of-type(4)': {
-                flexBasis: '25%!important',
+                flexBasis: '30%!important',
               },
               '.MuiDataGrid-row .MuiDataGrid-cell:nth-of-type(5)': {
-                flexBasis: '10%!important',
+                flexBasis: '20%!important',
               },
               '.MuiDataGrid-row .MuiDataGrid-cell:nth-of-type(6)': {
                 flexBasis: '10%!important',
@@ -88,6 +93,6 @@ export const TableExam = ({ data, title, handleShow }) => {
   );
 };
 
-export default TableExam;
+export default TableLectures;
 
 

@@ -11,4 +11,6 @@ const configuration = {
   }
 };
 
+export const clientURL = "http://localhost:3001"
+
 export default configuration;

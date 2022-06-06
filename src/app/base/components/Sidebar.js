@@ -195,15 +195,15 @@ const Sidebar = () => {
                   link={Routes.ModulePage.path}
                 />
                 <NavItem
-                  title={Routes.ModulePage.name}
+                  title={Routes.SectionPage.name}
                   icon={faHandHoldingUsd}
-                  link={Routes.ModulePage.path}
+                  link={Routes.SectionPage.path}
                 />
-                <NavItem
+                {/* <NavItem
                   title={Routes.LessonsPage.name}
                   icon={faHandHoldingUsd}
                   link={Routes.LessonsPage.path}
-                />
+                /> */}
               </CollapsableNavItem>
 
               <NavItem

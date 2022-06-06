@@ -2,10 +2,10 @@ import React from 'react';
 import { DataGrid } from '@mui/x-data-grid';
 
 import { Card} from '@themesberg/react-bootstrap';
-import './TableExam.css'
+import './TableSection.css'
 
 
-export const TableExam = ({ data, title, handleShow }) => {
+export const TableSection = ({ data, title, handleShow, deleteSection }) => {
   const [pageSize, setPageSize] = React.useState(10);
 
   return (
@@ -88,6 +88,6 @@ export const TableExam = ({ data, title, handleShow }) => {
   );
 };
 
-export default TableExam;
+export default TableSection;
 
 

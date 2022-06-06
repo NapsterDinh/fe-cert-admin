@@ -12,7 +12,7 @@ const Footer = () => {
         <Row>
           <Col xs={12} lg={6} className="mb-4 mb-lg-0">
             <p className="mb-0 text-center text-xl-left">
-              Copyright © 2019-{`${currentYear} `}
+              Copyright © 2022-{`${currentYear} `}
               <Card.Link href="https://themesberg.com" target="_blank" className="text-blue text-decoration-none fw-normal">
                 Themesberg
               </Card.Link>

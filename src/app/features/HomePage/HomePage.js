@@ -81,6 +81,18 @@ const HomePage = () => (
         component={Routes.AddNewLessonsPage.element}
       />
 
+      <RouteWithSidebar
+        exact={Routes.SectionPage.exact}
+        path={Routes.SectionPage.path}
+        component={Routes.SectionPage.element}
+      />
+
+      <RouteWithSidebar
+        exact={Routes.NewSectionPage.exact}
+        path={Routes.NewSectionPage.path}
+        component={Routes.NewSectionPage.element}
+      />
+
       <Route component={NotFound} />
       <Route
         exact={Routes.LockPage.exact}

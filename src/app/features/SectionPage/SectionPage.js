@@ -7,72 +7,63 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { GridActionsCellItem } from "@mui/x-data-grid";
-import { Breadcrumb, Button, ButtonGroup } from "@themesberg/react-bootstrap";
+import { Breadcrumb, Button } from "@themesberg/react-bootstrap";
 import { Tag, Tooltip } from "antd";
-import { ModalModule } from "app/base/components/Modal/Modal";
-import { openNotificationWithIcon } from "app/base/components/Notification";
-import {
-  getQuestionById,
-  getAllTopic,
-  deleteTopic as deleteTopicAPI,
-} from "app/core/apis/topic";
+import ModalConfirmDelete from "app/base/components/ModalConfirmDelete/ModalConfirmDelete";
 //data
 import { Routes } from "app/routes";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toggleShowModal, updateModalInfo } from "store/confirmDeleteReducer";
-import ModalConfirmDelete from "app/base/components/ModalConfirmDelete/ModalConfirmDelete";
-import TableModule from "./TableModule";
-const ModulePage = () => {
+import ModalAddNewSection from "./ModalAddNewSection/ModalAddNewSection";
+import TableSection from "./TablesSection/TablesSection";
+import { getAllSection as getAllSectionAPI, deleteSection } from "app/core/apis/section";
+import { openNotificationWithIcon } from "app/base/components/Notification";
+
+const SectionPage = () => {
   const [data, setData] = useState([]);
   const [show, setShow] = useState(false);
 
   const modalConfirmDelete = useSelector((state) => state.confirmDelete);
   const dispatch = useDispatch();
-  const handleClose = () => {
-    setCurrentTopic("");
-    setShow(false);
-  };
-
+  const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
-  const [currentTopic, setCurrentTopic] = useState("");
+  const [currentSection, setCurrentSection] = useState("");
 
   dispatch(
     updateModalInfo({
-      title: "Confirm delete this topic",
-      body: `Are you sure to delete this topic ?
+      title: "Confirm delete this section",
+      body: `Are you sure to delete this section ?
             This modified changes will not saved and you can't rollback`,
     })
   );
 
-  const handleDeleteTopic = async () => {
+  const handleDeleteSection = async () => {
     try {
-      const response = await deleteTopicAPI({
-        _id: currentTopic,
+      const response = await deleteSection({
+        _id: currentSection,
       });
       if (response.status === 200) {
-        await fetchAllTopic();
+        await getAllSection();
         dispatch(toggleShowModal({ show: false }));
-        setCurrentTopic("");
-        openNotificationWithIcon("success", "Delete exam successfully");
+        openNotificationWithIcon("success", "Delete section successfully");
       }
     } catch (error) {
       alert(error);
     }
   };
 
-  const deleteTopic = React.useCallback(
+  const deleteUser = React.useCallback(
     (id) => () => {
-      setCurrentTopic(id);
+      setCurrentSection(id);
       dispatch(toggleShowModal({ show: true }));
     },
     []
   );
 
-  const editTopic = React.useCallback(
-    (id) => () =>  {
-      setCurrentTopic(id);
-      setShow(true)
+  const editSection = React.useCallback(
+    (id) => () => {
+      window.location = `/section-management/${id}`;
     },
     []
   );
@@ -93,50 +84,39 @@ const ModulePage = () => {
         },
       },
       {
-        field: "slug",
-        type: "actions",
-        headerName: "Slug",
-        getActions: (params) => {
-          return [
-            <Tooltip
-              title={params.row.slug}
-              color={"#108ee9"}
-              key={params.row._id}
-            >
-              <a href="" target="_blank">
-                {params.row.slug}
-              </a>
-            </Tooltip>,
-          ];
-        },
+        field: "location",
+        type: "string",
+        headerName: "Location",
       },
       {
         field: "title",
         type: "string",
-        headerName: "Title of Topic",
+        headerName: "Title of Exam",
       },
       {
-        field: "updatedAt",
+        field: "eventDate",
         type: "actions",
-        headerName: "Last Updated",
+        headerName: "Event Date",
         getActions: (params) => {
           return [
             <span className="text-center">
-              {new Date(params.row.updatedAt).toLocaleString()}
+              {new Date(params.row.eventDate).toLocaleDateString()}
             </span>,
           ];
         },
       },
       {
-        field: "status",
+        field: "isPublic",
         type: "actions",
         headerName: "Status",
         getActions: (params) => {
           return [
             <Tag
-              color={params.row.status === "Public" ? "success" : "processing"}
+              color={
+                params.row.isPublic === "Public" ? "success" : "processing"
+              }
             >
-              {params.row.status}
+              {params.row.isPublic}
             </Tag>,
           ];
         },
@@ -148,33 +128,33 @@ const ModulePage = () => {
         getActions: (params) => [
           <GridActionsCellItem
             icon={<DeleteIcon />}
-            onClick={deleteTopic(params.id)}
+            onClick={deleteUser(params.id)}
             label="Delete"
           />,
           <GridActionsCellItem
             icon={<FontAwesomeIcon icon={faEye} className="me-2" />}
             label="View Details"
             showInMenu
-            onClick={editTopic(params.id)}
+            onClick={editSection(params.id)}
           />,
           <GridActionsCellItem
             icon={<FontAwesomeIcon icon={faEdit} className="me-2" />}
             label="Edit"
             showInMenu
-            onClick={editTopic(params.id)}
+            onClick={editSection(params.id)}
           />,
         ],
       },
     ],
-    [deleteTopic]
+    [deleteUser]
   );
 
-  const fetchAllTopic = async () => {
+  const getAllSection = async () => {
     try {
-      const response = await getAllTopic();
+      const response = await getAllSectionAPI();
       if (response.status === 200) {
         setData(
-          response?.data?.topic?.map((item) => ({
+          [...response?.data?.topicSection]?.map((item) => ({
             ...item,
             id: item._id,
           }))
@@ -182,27 +162,24 @@ const ModulePage = () => {
       }
     } catch (error) {}
   };
+
   useEffect(() => {
     (async () => {
-      await fetchAllTopic();
+      await getAllSection();
     })();
   }, []);
 
   return (
     <>
-      <ModalModule
-        currentTopic={currentTopic}
-        show={show}
-        getAllTopic={fetchAllTopic}
-        handleClose={handleClose}
-      />
       <ModalConfirmDelete
-        handleSubmit={handleDeleteTopic}
-        handleClose={() => {
-          setCurrentTopic("");
-          dispatch(toggleShowModal({ show: false }));
-        }}
+        handleSubmit={handleDeleteSection}
+        handleClose={() => dispatch(toggleShowModal({ show: false }))}
         {...modalConfirmDelete}
+      />
+      <ModalAddNewSection
+        show={show}
+        handleClose={handleClose}
+        getAllSection={getAllSection}
       />
       <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4">
         <div className="d-block mb-4 mb-md-0">
@@ -213,34 +190,26 @@ const ModulePage = () => {
             <Breadcrumb.Item>
               <FontAwesomeIcon icon={faHome} />
             </Breadcrumb.Item>
-            <Breadcrumb.Item active>{Routes.ModulePage.name}</Breadcrumb.Item>
+            <Breadcrumb.Item active>{Routes.SectionPage.name}</Breadcrumb.Item>
           </Breadcrumb>
-          <h4>{Routes.ModulePage.name}</h4>
+          <h4>{Routes.SectionPage.name}</h4>
           <p className="mb-0">
             Below tables will shown all of course in your website and some
             information about them.
           </p>
         </div>
         <div className="btn-toolbar mb-2 mb-md-0">
-          <Button className="mx-2" onClick={handleShow}>
+          <Button className="mx-2" onClick={() => handleShow()}>
             <FontAwesomeIcon icon={faPlus} className="me-2" />
-            New Topic
+            New Section
           </Button>
-          {/* <ButtonGroup>
-            <Button variant="outline-primary" size="sm">
-              Share
-            </Button>
-            <Button variant="outline-primary" size="sm">
-              Export
-            </Button>
-          </ButtonGroup> */}
         </div>
       </div>
 
       <div className="table-settings mb-4">
-        <TableModule
+        <TableSection
           title={columns}
-          deleteUser={deleteTopic}
+          deleteUser={deleteUser}
           data={data}
           handleShow={handleShow}
         />
@@ -249,4 +218,4 @@ const ModulePage = () => {
   );
 };
 
-export default ModulePage;
+export default SectionPage;

@@ -212,14 +212,14 @@ const QuestionPage = () => {
                         <FontAwesomeIcon icon={faPlus} className="me-2" />
                         New Question
                     </Button>
-                    <ButtonGroup>
+                    {/* <ButtonGroup>
                         <Button variant="outline-primary" size="sm">
                             Share
                         </Button>
                         <Button variant="outline-primary" size="sm">
                             Export
                         </Button>
-                    </ButtonGroup>
+                    </ButtonGroup> */}
                 </div>
             </div>
 

@@ -1,0 +1,19 @@
+.modal-lecture .jodit-react-container {
+  width: 100%;
+}
+@media (min-width: 576px) {
+  .modal-lecture .modal-dialog {
+    max-width: 1400px !important;
+  }
+}
+.modal-lecture .quill .ql-container .ql-editor {
+  min-height: 400px;
+}
+.modal-lecture .col-left {
+  height: 700px;
+  overflow-y: auto;
+}
+
+.form-group.error .invalid-feedback {
+  display: inline;
+}
