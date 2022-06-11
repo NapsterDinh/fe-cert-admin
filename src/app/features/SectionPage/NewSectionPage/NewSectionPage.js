@@ -1,14 +1,10 @@
 import {
   faAngleDoubleRight,
-  faEdit,
-  faEye,
   faHome,
   faPlus,
   faSave,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import DeleteIcon from "@mui/icons-material/Delete";
-import { GridActionsCellItem } from "@mui/x-data-grid";
 import {
   Breadcrumb,
   Button,
@@ -18,28 +14,38 @@ import {
   InputGroup,
   Row,
 } from "@themesberg/react-bootstrap";
-import { Tag, Tooltip } from "antd";
 import ModalConfirmDelete from "app/base/components/ModalConfirmDelete/ModalConfirmDelete";
+import { openNotificationWithIcon } from "app/base/components/Notification";
+import { deleteLesson } from "app/core/apis/lessons";
+import { editSection, getSectionById } from "app/core/apis/section";
 // import { section } from "app/data/section";
 //data
+import { ErrorMessage, Field, Formik } from "formik";
 import { Routes } from "app/routes";
-import { clientURL } from "configuration";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
+import { useHistory, useParams } from "react-router-dom";
 import { toggleShowModal, updateModalInfo } from "store/confirmDeleteReducer";
 import ModalAddSection from "../ModalAddSection/ModalAddSection";
 import ModalLecture from "../ModalLecture/ModalLecture";
 import TableLectures from "../TableLectures/TableLectures";
-import { getSectionById } from "app/core/apis/section";
+import * as Yup from "yup";
+
+const schema = Yup.object().shape({
+  title: Yup.string().required("Title is required"),
+  slug: Yup.string().required("Slug is required"),
+  status: Yup.string().oneOf(
+    [`public`, `private`],
+    "Selecting the status field is required"
+  ),
+  lessons: Yup.array(),
+});
 
 const NewSectionPage = () => {
   let { idSection } = useParams();
+  const history = useHistory();
   const [data, setData] = useState("");
   const [show, setShow] = useState(false);
-  const [title, setTitle] = useState("");
-  const [slug, setSlug] = useState("");
-  const [lectures, setLectures] = useState([]);
   const [showLecture, setShowLecture] = useState(false);
   const dispatch = useDispatch();
   const handleClose = () => setShow(false);
@@ -47,22 +53,24 @@ const NewSectionPage = () => {
   const [currentLecture, setCurrentLecture] = useState("");
   const modalConfirmDelete = useSelector((state) => state.confirmDelete);
 
-  const handleSaveSection = async (e) => {
-    e.preventDefault();
+  const handleSaveSection = async (values) => {
     const section = {
       ...data,
-      title: title,
-      slug: slug,
-      description: e.target.description.value.trim(),
-      isPublic: e.target.isPublic[0].checked ? "Public" : "Private",
-      lectures: lectures,
+      title: values.title,
+      slug: values.slug,
+      status: values.status,
+      lessons: data?.lessons,
     };
-    //call API
+    try {
+      const response = await editSection(section);
+      if (response.status === 201) {
+        openNotificationWithIcon("success", "Update section successfully");
+        history.push("/section-management");
+      } else {
+        openNotificationWithIcon("error", "Update section failed");
+      }
+    } catch (error) {}
   };
-
-  useEffect(() => {
-    setSlug(generatorSlug(title.trim()));
-  }, [title]);
 
   const generatorSlug = (title) => {
     if (title === "") {
@@ -77,9 +85,6 @@ const NewSectionPage = () => {
       const response = await getSectionById(idSection);
       if (response.status === 200) {
         setData(response?.data?.topicSection?.[0]);
-        setTitle(response?.data?.topicSection?.[0]?.title);
-        setSlug(response?.data?.topicSection?.[0]?.slug);
-        setLectures(response?.data?.topicSection?.[0]?.lessons);
       }
     } catch (error) {
       alert(error);
@@ -96,140 +101,36 @@ const NewSectionPage = () => {
 
   dispatch(
     updateModalInfo({
-      title: "Confirm delete this lecture",
-      body: `Are you sure to delete this lecture ?
+      title: "Confirm delete this lesson",
+      body: `Are you sure to delete this lesson ?
         This modified changes will not saved and you can't rollback`,
     })
   );
 
   const handleDeleteLecture = async () => {
     try {
+      const response = await deleteLesson(currentLecture);
+      dispatch(toggleShowModal({ show: false }));
+      if (response.status === 200) {
+        await fetchSectionByID();
+        openNotificationWithIcon("success", "Delete lesson successfully");
+      } else {
+        openNotificationWithIcon("error", "Delete lesson failed");
+      }
     } catch (error) {
       alert(error);
     }
   };
 
-  const deleteLecture = React.useCallback(
-    (id) => () => {
-      setCurrentLecture(id);
-      dispatch(toggleShowModal({ show: true }));
-    },
-    []
-  );
+  const deleteLecture = (id) => {
+    setCurrentLecture(id);
+    dispatch(toggleShowModal({ show: true }));
+  };
 
-  const editLecture = React.useCallback(
-    (id) => () => {
-      setCurrentLecture(id);
-      setShowLecture(true);
-    },
-    []
-  );
-
-  const columns = React.useMemo(
-    () => [
-      {
-        field: "slug",
-        headerName: "Slug",
-        type: "actions",
-        align: "left",
-        getActions: (params) => {
-          return [
-            <Tooltip title={params.row.slug} color={"#108ee9"} key={"#108ee9"}>
-              <a
-                target={"_blank"}
-                rel={"noreferrer"}
-                href={clientURL + params.row.slug}
-              >
-                {params.row.slug}
-              </a>
-            </Tooltip>,
-          ];
-        },
-      },
-      {
-        field: "tablesOfContent",
-        type: "actions",
-        headerName: "Total of Lectures",
-        getActions: (params) => {
-          return [
-            <span className="text-center">
-              {params.row?.tablesOfContent.length}
-            </span>,
-          ];
-        },
-      },
-      {
-        field: "title",
-        type: "actions",
-        align: "left",
-        headerName: "Title of Lecture",
-        getActions: (params) => {
-          return [
-            <Tooltip title={params.row.id} color={"#108ee9"} key={"#108ee9"}>
-              {params.row.id}
-            </Tooltip>,
-          ];
-        },
-      },
-      {
-        field: "dateCreated",
-        type: "actions",
-        headerName: "Date created",
-        getActions: (params) => {
-          return [
-            <span className="text-center">
-              {new Date(params.row.dateCreated).toLocaleDateString()}
-            </span>,
-          ];
-        },
-      },
-      {
-        field: "isPublic",
-        type: "actions",
-        headerName: "Status",
-        getActions: (params) => {
-          return [
-            <Tag
-              color={
-                params.row.isPublic === "Public" ? "success" : "processing"
-              }
-            >
-              {params.row.isPublic}
-            </Tag>,
-          ];
-        },
-      },
-      {
-        field: "actions",
-        headerName: "Action",
-        type: "actions",
-        getActions: (params) => {
-          return [
-            <GridActionsCellItem
-              icon={<DeleteIcon />}
-              onClick={deleteLecture(params.id)}
-              label="Delete"
-            />,
-            <GridActionsCellItem
-              icon={<FontAwesomeIcon icon={faEye} className="me-2" />}
-              label="View Details"
-              showInMenu
-              onClick={editLecture(params.id)}
-            />,
-            <GridActionsCellItem
-              icon={<FontAwesomeIcon icon={faEdit} className="me-2" />}
-              label="Edit"
-              showInMenu
-              onClick={editLecture(params.id)}
-            />,
-          ];
-        },
-      },
-    ],
-    [deleteLecture, editLecture]
-  );
-
-  const fetchLecturesByIdSection = async () => {};
+  const editLecture = (id) => {
+    setCurrentLecture(id);
+    setShowLecture(true);
+  };
 
   return (
     <>
@@ -247,198 +148,242 @@ const NewSectionPage = () => {
       <ModalLecture
         fetchSectionByID={fetchSectionByID}
         idSection={idSection}
-        setLectures={setLectures}
-        lectures={lectures}
         show={showLecture}
+        lectures={data?.lessons}
+        dataSection={data}
         selectedLecture={currentLecture}
         handleClose={() => {
           setCurrentLecture("");
           setShowLecture(false);
         }}
       />
-      <Form onSubmit={handleSaveSection}>
-        <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4">
-          <div className="d-block mb-4 mb-md-0">
-            <Breadcrumb
-              className="d-none d-md-inline-block"
-              listProps={{
-                className: "breadcrumb-dark breadcrumb-transparent",
-              }}
-            >
-              <Breadcrumb.Item>
-                <FontAwesomeIcon icon={faHome} />
-              </Breadcrumb.Item>
-              <Breadcrumb.Item
-                onClick={() => (window.location = "/section-management")}
-              >
-                {Routes.SectionPage.name}
-              </Breadcrumb.Item>
-              <Breadcrumb.Item>
-                <FontAwesomeIcon icon={faAngleDoubleRight} />
-              </Breadcrumb.Item>
-              <Breadcrumb.Item active>Edit section</Breadcrumb.Item>
-            </Breadcrumb>
-            <h4>Edit section</h4>
-            <p className="mb-0">
-              Below tables will shown all of course in your website and some
-              information about them.
-            </p>
-          </div>
-          <div className="btn-toolbar mb-2 mb-md-0">
-            <Button className="mx-2" type="submit">
-              <FontAwesomeIcon icon={faSave} className="me-2" />
-              Save Exam
-            </Button>
-            <Button
-              variant="outline-primary"
-              className="mx-2"
-              onClick={handleShow}
-            >
-              Cancel
-            </Button>
-          </div>
-        </div>
-
-        <div className="table-settings mb-4 ">
-          <Card
-            border="light"
-            className="table-wrapper table-responsive shadow-sm"
-          >
-            <Card.Body className="pt-0 my-4">
-              <Row>
-                <Col lg={7}>
-                  <Form.Group
-                    className={"form-group mb-3"}
-                    as={Col}
-                    controlId="formTitle"
+      <Formik
+        enableReinitialize
+        initialValues={data}
+        validationSchema={schema}
+        onSubmit={(values, { setSubmitting, resetForm }) =>
+          handleSaveSection(values, setSubmitting, resetForm)
+        }
+      >
+        {(props) => {
+          const {
+            values,
+            touched,
+            errors,
+            isSubmitting,
+            handleChange,
+            setFieldValue,
+            handleBlur,
+            handleSubmit,
+          } = props;
+          return (
+            <Form noValidate onSubmit={handleSubmit}>
+              <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4">
+                <div className="d-block mb-4 mb-md-0">
+                  <Breadcrumb
+                    className="d-none d-md-inline-block"
+                    listProps={{
+                      className: "breadcrumb-dark breadcrumb-transparent",
+                    }}
                   >
-                    <Form.Label>Title</Form.Label>
-                    <InputGroup>
-                      <Form.Control
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}
-                        placeholder="Enter title"
-                        name="title"
-                        type="text"
-                      />
-                    </InputGroup>
-                  </Form.Group>
-                  <Form.Group
-                    className={"form-group mb-3"}
-                    as={Col}
-                    controlId="formTitle"
-                  >
-                    <Form.Label>Slug</Form.Label>
-                    <InputGroup>
-                      <Form.Control
-                        value={slug}
-                        readOnly
-                        placeholder="Enter slug"
-                        name="slug"
-                        type="text"
-                      />
-                    </InputGroup>
-                  </Form.Group>
-                  <Form.Group
-                    className={"form-group error mb-3"}
-                    controlId="formDescription"
-                  >
-                    <Form.Label>Description</Form.Label>
-                    <InputGroup>
-                      <Form.Control
-                        defaultValue={
-                          data?.description !== undefined
-                            ? data?.description
-                            : ""
-                        }
-                        placeholder="Enter description"
-                        name="description"
-                        as="textarea"
-                        rows={5}
-                      />
-                    </InputGroup>
-                  </Form.Group>
-                </Col>
-                <Col lg={4} className="mx-5">
-                  <Form.Group
-                    className={"form-group mb-3 d-flex"}
-                    as={Col}
-                    controlId="formTitle"
-                  >
-                    <div>
-                      <Form.Label>Status</Form.Label>
-                      <div key={`inline-radio-status`} className="mb-3">
-                        {data?.isPublic !== undefined &&
-                        data?.isPublic === "Public" ? (
-                          <>
-                            <Form.Check
-                              inline
-                              label="Public"
-                              name="isPublic"
-                              defaultChecked
-                              type="radio"
-                              id={`inline-radio-3`}
-                            />
-                            <Form.Check
-                              inline
-                              name="isPublic"
-                              label="Private"
-                              type="radio"
-                              id={`inline-radio-4`}
-                            />
-                          </>
-                        ) : (
-                          <>
-                            <Form.Check
-                              inline
-                              label="Public"
-                              name="isPublic"
-                              type="radio"
-                              id={`inline-radio-3`}
-                            />
-                            <Form.Check
-                              inline
-                              defaultChecked
-                              name="isPublic"
-                              label="Private"
-                              type="radio"
-                              id={`inline-radio-4`}
-                            />
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  </Form.Group>
-                </Col>
-              </Row>
-              <Row>
-                <Form.Group className="mb-3" controlId="formDescription">
-                  <div className="d-flex justify-content-between my-3">
-                    <Form.Label
-                      style={{ lineHeight: "36px", fontSize: "20px" }}
+                    <Breadcrumb.Item>
+                      <FontAwesomeIcon icon={faHome} />
+                    </Breadcrumb.Item>
+                    <Breadcrumb.Item
+                      onClick={() => (window.location = "/section-management")}
                     >
-                      Lectures List
-                    </Form.Label>
-                    <Button
-                      className="mx-2"
-                      onClick={() => setShowLecture(true)}
-                    >
-                      <FontAwesomeIcon icon={faPlus} className="me-2" />
-                      New Lecture
-                    </Button>
-                  </div>
+                      {Routes.SectionPage.name}
+                    </Breadcrumb.Item>
+                    <Breadcrumb.Item>
+                      <FontAwesomeIcon icon={faAngleDoubleRight} />
+                    </Breadcrumb.Item>
+                    <Breadcrumb.Item active>Edit section</Breadcrumb.Item>
+                  </Breadcrumb>
+                  <h4>Edit section</h4>
+                  <p className="mb-0">
+                    Below tables will shown all of course in your website and
+                    some information about them.
+                  </p>
+                </div>
+                <div className="btn-toolbar mb-2 mb-md-0">
+                  <Button
+                    className="mx-2"
+                    type="submit"
+                    disabled={isSubmitting}
+                  >
+                    <FontAwesomeIcon icon={faSave} className="me-2" />
+                    Save Section
+                  </Button>
+                  <Button
+                    variant="outline-primary"
+                    className="mx-2"
+                    onClick={handleShow}
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </div>
 
-                  <TableLectures
-                    title={columns}
-                    data={lectures !== "" ? data.lectures : []}
-                    handleShow={handleShow}
-                  />
-                </Form.Group>
-              </Row>
-            </Card.Body>
-          </Card>
-        </div>
-      </Form>
+              <div className="table-settings mb-4 ">
+                <Card
+                  border="light"
+                  className="table-wrapper table-responsive shadow-sm"
+                >
+                  <Card.Body className="pt-0 my-4">
+                    <Row>
+                      <Col lg={7}>
+                        <Form.Group
+                          className={
+                            errors.title && touched.title && "error mb-4"
+                          }
+                          controlId="tutorialTitle"
+                        >
+                          <Form.Label>Title</Form.Label>
+                          <ErrorMessage
+                            name="title"
+                            component="div"
+                            className="invalid-feedback"
+                          />
+                          <InputGroup
+                            className={
+                              errors.title && touched.title && "error mb-3"
+                            }
+                          >
+                            <Form.Control
+                              autoFocus
+                              value={values.title}
+                              onChange={(e) => {
+                                handleChange(e);
+                                setFieldValue(
+                                  "slug",
+                                  generatorSlug(e.target.value)
+                                );
+                              }}
+                              onBlur={handleBlur}
+                              className={
+                                errors.title && touched.title && "error"
+                              }
+                              name="title"
+                              type="text"
+                              placeholder="Enter title"
+                            />
+                          </InputGroup>
+                        </Form.Group>
+                        <Form.Group
+                          className={
+                            errors.slug && touched.slug && "error mb-4"
+                          }
+                          controlId="tutorialTitle"
+                        >
+                          <Form.Label>Slug</Form.Label>
+                          <ErrorMessage
+                            name="slug"
+                            component="div"
+                            className="invalid-feedback"
+                          />
+                          <InputGroup
+                            className={
+                              errors.slug && touched.slug && "error mb-3"
+                            }
+                          >
+                            <Form.Control
+                              value={values.slug}
+                              onChange={handleChange}
+                              onBlur={handleBlur}
+                              readOnly
+                              className={errors.slug && touched.slug && "error"}
+                              name="slug"
+                              type="text"
+                              placeholder="Enter slug"
+                            />
+                          </InputGroup>
+                        </Form.Group>
+                      </Col>
+                      <Col lg={4} className="mx-5">
+                        <Form.Group
+                          className={
+                            "form-group mb-3 d-flex justify-content-between"
+                          }
+                          as={Col}
+                          controlId="formTitle"
+                        >
+                          <div
+                            className={
+                              errors.status && touched.status && "error mb-4"
+                            }
+                          >
+                            <Form.Label>Status</Form.Label>
+
+                            <div key={`inline-radio-status`} className="mb-3">
+                              <Form.Check
+                                type={`radio`}
+                                inline
+                                label="Public"
+                                id={`inline-radio-3`}
+                                value="public"
+                                checked={values.status === "public"}
+                                onChange={() =>
+                                  setFieldValue("status", "public")
+                                }
+                                name="status"
+                              />
+                              <Form.Check
+                                type={`radio`}
+                                inline
+                                label="Private"
+                                id={`inline-radio-5`}
+                                value="private"
+                                checked={values.status === "private"}
+                                onChange={() =>
+                                  setFieldValue("status", "private")
+                                }
+                                name="status"
+                              />
+                            </div>
+                            <ErrorMessage
+                              name="status"
+                              component="div"
+                              className="invalid-feedback"
+                            />
+                          </div>
+                        </Form.Group>
+                      </Col>
+                    </Row>
+                    <Row>
+                      <Form.Group className="mb-3" controlId="formDescription">
+                        <div className="d-flex justify-content-between my-3">
+                          <Form.Label
+                            style={{ lineHeight: "36px", fontSize: "20px" }}
+                          >
+                            Lessons List
+                          </Form.Label>
+                          <Button
+                            className="mx-2"
+                            onClick={() => setShowLecture(true)}
+                          >
+                            <FontAwesomeIcon icon={faPlus} className="me-2" />
+                            New Lesson
+                          </Button>
+                        </div>
+
+                        <TableLectures
+                          data={data?.lessons?.map((item) => ({
+                            ...item,
+                            id: item._id,
+                            key: item._id,
+                          }))}
+                          editLecture={editLecture}
+                          deleteLecture={deleteLecture}
+                        />
+                      </Form.Group>
+                    </Row>
+                  </Card.Body>
+                </Card>
+              </div>
+            </Form>
+          );
+        }}
+      </Formik>
     </>
   );
 };

@@ -10,35 +10,43 @@ import {
 import { addNewSection } from "app/core/apis/section";
 import React, { useEffect, useState } from "react";
 import { openNotificationWithIcon } from "app/base/components/Notification";
+import * as Yup from "yup";
+import { ErrorMessage, Formik, Field } from "formik";
+import './ModalAddNewSection.css'
+
+const schema = Yup.object().shape({
+  title: Yup.string().required("Title is required"),
+  slug: Yup.string().required("Slug is required"),
+  status: Yup.string().oneOf(
+    [`public`, `private`],
+    "Selecting the status field is required"
+  ),
+});
 
 const ModalAddNewSection = ({ show, handleClose, getAllSection }) => {
-  const [title, setTitle] = useState("");
-  const [slug, setSlug] = useState("");
-  const [description, setDescription] = useState("");
-  const handleSaveSection = async (e) => {
-    e.preventDefault();
+  const handleSaveSection = async (values, setSubmitting, resetForm) => {
     const section = {
-      title: title.trim(),
-      slug: slug.trim(),
-      description: description.trim(),
-      status: e.target.status[0].checked ? "public" : "private",
+      title: values.title.trim(),
+      slug: values.slug.trim(),
+      status: values.status,
     };
 
     try {
       const response = await addNewSection(section);
-
       if (response.status === 201) {
         await getAllSection();
         handleClose();
         openNotificationWithIcon("success", "Create section successfully");
+      } else {
+        handleClose();
+        openNotificationWithIcon("eror", "Create section failed");
       }
-    } catch (error) {}
-    //call API
+    } catch (error) {
+    } finally {
+      setSubmitting(false);
+      resetForm();
+    }
   };
-
-  useEffect(() => {
-    setSlug(generatorSlug(title.trim()));
-  }, [title]);
 
   const generatorSlug = (title) => {
     if (title === "") {
@@ -54,114 +62,153 @@ const ModalAddNewSection = ({ show, handleClose, getAllSection }) => {
         backdrop={`static`}
         show={show}
         onHide={() => {
-          setDescription("");
-          setSlug("");
-          setTitle("");
           handleClose();
         }}
-        className="modal-lecture"
+        className="modal-section"
       >
-        <Form onSubmit={handleSaveSection}>
-          <Modal.Header closeButton>
-            <Modal.Title>Add new Section</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <Row>
-              <Form.Group
-                className={"form-group mb-3"}
-                as={Col}
-                controlId="formTitle"
-              >
-                <Form.Label>Title</Form.Label>
-                <InputGroup>
-                  <Form.Control
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    placeholder="Enter title"
-                    name="title"
-                    type="text"
-                  />
-                </InputGroup>
-              </Form.Group>
-              <div>
-                <Form.Group
-                  className={"form-group mb-3"}
-                  as={Col}
-                  controlId="formTitle"
-                >
-                  <Form.Label>Slug</Form.Label>
-                  <InputGroup>
-                    <Form.Control
-                      value={slug}
-                      readOnly
-                      placeholder="Enter slug"
-                      name="slug"
-                      type="text"
-                    />
-                  </InputGroup>
-                </Form.Group>
-              </div>
-              <Form.Group
-                className={"form-group error mb-3"}
-                controlId="formDescription"
-              >
-                <Form.Label>Description</Form.Label>
-                <InputGroup>
-                  <Form.Control
-                    placeholder="Enter description"
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    name="description"
-                    as="textarea"
-                    rows={5}
-                  />
-                </InputGroup>
-              </Form.Group>
-              <Form.Group
-                className={"form-group mb-3 d-flex"}
-                as={Col}
-                controlId="formTitle"
-              >
-                <div>
-                  <Form.Label>Status</Form.Label>
-                  <div key={`inline-radio-status`} className="mb-3">
-                    <Form.Check
-                      inline
-                      label="public"
-                      name="status"
-                      defaultChecked
-                      type="radio"
-                      id={`inline-radio-3`}
-                    />
-                    <Form.Check
-                      inline
-                      name="status"
-                      label="private"
-                      type="radio"
-                      id={`inline-radio-4`}
-                    />
-                  </div>
-                </div>
-              </Form.Group>
-            </Row>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button
-              variant="secondary"
-              onClick={() => {
-                setDescription("");
-                setSlug("");
-                setTitle("");
-                handleClose();
-              }}
-            >
-              Close
-            </Button>
-            <Button variant="primary" type="submit">
-              Submit
-            </Button>
-          </Modal.Footer>
-        </Form>
+        <Formik
+          enableReinitialize
+          initialValues={{
+            title: "",
+            slug: "",
+            status: "public",
+          }}
+          validationSchema={schema}
+          onSubmit={(values, { setSubmitting, resetForm }) =>
+            handleSaveSection(values, setSubmitting, resetForm)
+          }
+        >
+          {(props) => {
+            const {
+              values,
+              touched,
+              errors,
+              isSubmitting,
+              handleChange,
+              setFieldValue,
+              handleBlur,
+              handleSubmit,
+            } = props;
+            return (
+              <Form noValidate onSubmit={handleSubmit}>
+                <Modal.Header closeButton>
+                  <Modal.Title>Add new Section</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                  <Row>
+                    <Form.Group
+                      className={errors.title && touched.title && "error mb-4"}
+                      controlId="tutorialTitle"
+                    >
+                      <Form.Label>Title</Form.Label>
+                      <InputGroup
+                        className={
+                          errors.title && touched.title && "error mb-3"
+                        }
+                      >
+                        <Form.Control
+                          autoFocus
+                          value={values.title}
+                          onChange={(e) => {
+                            handleChange(e);
+                            setFieldValue(
+                              "slug",
+                              generatorSlug(e.target.value)
+                            );
+                          }}
+                          onBlur={handleBlur}
+                          className={errors.title && touched.title && "error"}
+                          name="title"
+                          type="text"
+                          placeholder="Enter title"
+                        />
+                      </InputGroup>
+                      <ErrorMessage
+                        name="title"
+                        component="div"
+                        className="invalid-feedback"
+                      />
+                    </Form.Group>
+                    <Form.Group
+                      className={errors.slug && touched.slug && "error mb-4"}
+                      controlId="tutorialTitle"
+                    >
+                      <Form.Label>Slug</Form.Label>
+                      <InputGroup
+                        className={errors.slug && touched.slug && "error mb-3"}
+                      >
+                        <Form.Control
+                          value={values.slug}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                          readOnly
+                          className={errors.slug && touched.slug && "error"}
+                          name="slug"
+                          type="text"
+                          placeholder="Enter slug"
+                        />
+                      </InputGroup>
+
+                      <ErrorMessage
+                        name="slug"
+                        component="div"
+                        className="invalid-feedback"
+                      />
+                    </Form.Group>
+                    <Form.Group
+                      className={"form-group mb-3 d-flex"}
+                      as={Col}
+                      controlId="formTitle"
+                    >
+                      <div>
+                        <Form.Label>Status</Form.Label>
+                        <div key={`inline-radio-status`} className="mb-3">
+                          <Form.Check
+                            type={`radio`}
+                            inline
+                            label="Public"
+                            id={`inline-radio-3`}
+                            value="public"
+                            checked={values.status === "public"}
+                            onChange={() => setFieldValue("status", "public")}
+                            name="status"
+                          />
+                          <Form.Check
+                            type={`radio`}
+                            inline
+                            label="Private"
+                            id={`inline-radio-5`}
+                            value="private"
+                            checked={values.status === "private"}
+                            onChange={() => setFieldValue("status", "private")}
+                            name="status"
+                          />
+                        </div>
+                      </div>
+                    </Form.Group>
+                  </Row>
+                </Modal.Body>
+                <Modal.Footer>
+                  <Button
+                    variant="secondary"
+                    onClick={() => {
+                      handleClose();
+                    }}
+                  >
+                    Close
+                  </Button>
+                  <Button
+                    variant="primary"
+                    type="submit"
+                    disabled={isSubmitting}
+                  >
+                    Submit
+                  </Button>
+                </Modal.Footer>
+              </Form>
+            );
+          }}
+        </Formik>
       </Modal>
     </>
   );

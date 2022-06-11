@@ -211,11 +211,11 @@ const Sidebar = () => {
                 icon={faBookOpen}
                 link={Routes.ExamPage.path}
               />
-              <NavItem
+              {/* <NavItem
                 title={Routes.QuestionPage.name}
                 icon={faQuestion}
                 link={Routes.QuestionPage.path}
-              />
+              /> */}
               {/* <NavItem external title="Calendar" link="https://demo.themesberg.com/volt-pro-react/#/calendar" target="_blank" badgeText="Pro" icon={faCalendarAlt} />
               <NavItem external title="Map" link="https://demo.themesberg.com/volt-pro-react/#/map" target="_blank" badgeText="Pro" icon={faMapPin} />
 

@@ -12,7 +12,7 @@
 // =========================================================
 
 // * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software. Please contact us to request a removal.
-@import 'react-quill/dist/quill.snow.css';
+@import "react-quill/dist/quill.snow.css";
 @import url("https://fonts.googleapis.com/css?family=Nunito+Sans:300,400,600,700,800&display=swap");
 
 // Bootstrap mixins and functions
@@ -42,14 +42,20 @@
 // Components
 @import "volt/components";
 
-.jodit-container
-{
-    min-width: auto!important;
+.jodit-container {
+  min-width: auto !important;
 }
-.MuiDataGrid-root
-{
-    border: none!important;
-    margin-top: 10px;
+.MuiDataGrid-root {
+  border: none !important;
+  margin-top: 10px;
+}
+.error {
+  .invalid-feedback {
+    display: block;
+  }
+}
+.form-label {
+  margin-top: 1rem;
 }
 
 // write your custom styles here!

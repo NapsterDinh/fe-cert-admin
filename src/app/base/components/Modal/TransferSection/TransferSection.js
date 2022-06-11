@@ -56,28 +56,26 @@ const TableTransfer = ({ leftColumns, rightColumns, ...restProps }) => (
 
 const leftTableColumns = [
   {
-    dataIndex: "topic",
-    title: "Topic",
-    render: (topic) => <Tag>{topic}</Tag>,
+    dataIndex: "key",
+    title: "ID",
   },
   {
-    dataIndex: "question",
-    title: "Question",
+    dataIndex: "title",
+    title: "Title",
   },
 ];
 const rightTableColumns = [
   {
-    dataIndex: "topic",
-    title: "Topic",
-    render: (topic) => <Tag>{topic}</Tag>,
+    dataIndex: "key",
+    title: "ID",
   },
   {
-    dataIndex: "question",
-    title: "Question",
+    dataIndex: "title",
+    title: "Title",
   },
 ];
 
-const TransferQuestions = ({ data, questions, setQuestions }) => {
+const TransferSection = ({ data, questions, setQuestions }) => {
   const handleOnChange = (nextTargetKeys, direction, moveKeys) => {
     setQuestions(nextTargetKeys);
   };
@@ -91,8 +89,8 @@ const TransferQuestions = ({ data, questions, setQuestions }) => {
         onChange={handleOnChange}
         filterOption={(inputValue, item) => {
           return (
-            item.topic?.toLowerCase().indexOf(inputValue) !== -1 ||
-            item.question?.toLowerCase().search(inputValue) !== -1
+            item.id?.toLowerCase().indexOf(inputValue) !== -1 ||
+            item.title?.toLowerCase().search(inputValue) !== -1
           );
         }}
         leftColumns={leftTableColumns}
@@ -102,4 +100,4 @@ const TransferQuestions = ({ data, questions, setQuestions }) => {
   );
 };
 
-export default TransferQuestions;
+export default TransferSection;

@@ -18,5 +18,5 @@ export const editLesson = (data) => {
 };
 
 export const deleteLesson = (data) => {
-  return instance.delete(`/api/v1/topic/lesson?_id=${data._id}`);
+  return instance.delete(`/api/v1/topic/lesson?_id=${data}`);
 };

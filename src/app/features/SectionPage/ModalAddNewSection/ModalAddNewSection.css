@@ -1,0 +1,17 @@
+
+@media (min-width: 576px) {
+  .modal-section .modal-dialog {
+    max-width: 600px !important;
+  }
+}
+.modal-section .quill .ql-container .ql-editor {
+  min-height: 400px;
+}
+.modal-section .col-left {
+  height: 700px;
+  overflow-y: auto;
+}
+
+.form-group.error .invalid-feedback {
+  display: inline;
+}

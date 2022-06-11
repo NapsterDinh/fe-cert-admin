@@ -1,0 +1,16 @@
+@media (min-width: 576px) {
+  .modal-add-new-exam .modal-dialog {
+    max-width: 1000px !important;
+  }
+}
+.modal-add-new-exam .quill .ql-container .ql-editor {
+  min-height: 400px;
+}
+.modal-add-new-exam .col-left {
+  height: 700px;
+  overflow-y: auto;
+}
+
+.form-group.error .invalid-feedback {
+  display: inline;
+}

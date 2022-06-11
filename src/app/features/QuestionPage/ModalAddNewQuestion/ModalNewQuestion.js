@@ -26,21 +26,15 @@ const ModalAddNewQuestion = ({
   const [selectedTopicID, setSelectedTopicID] = useState("");
   const [question, setQuestion] = useState("");
   const [explanation, setExplanation] = useState("");
-
-  console.log(item);
-
   useEffect(() => {
-    if(item !== "")
-    {
-      setQuestion(item.question)
-      setExplanation(item.explanation)
+    if (item !== "") {
+      setQuestion(item.question);
+      setExplanation(item.explanation);
+    } else {
+      setQuestion("");
+      setExplanation("");
     }
-    else
-    {
-      setQuestion("")
-      setExplanation("")
-    }
-  }, [item])
+  }, [item]);
 
   const handleAddNewQuestion = async (e) => {
     e.preventDefault();

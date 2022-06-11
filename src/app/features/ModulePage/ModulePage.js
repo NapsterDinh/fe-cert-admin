@@ -22,7 +22,8 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toggleShowModal, updateModalInfo } from "store/confirmDeleteReducer";
 import ModalConfirmDelete from "app/base/components/ModalConfirmDelete/ModalConfirmDelete";
-import TableModule from "./TableModule";
+import TableModule from "./TableModule/TableModule";
+
 const ModulePage = () => {
   const [data, setData] = useState([]);
   const [show, setShow] = useState(false);
@@ -61,113 +62,15 @@ const ModulePage = () => {
     }
   };
 
-  const deleteTopic = React.useCallback(
-    (id) => () => {
-      setCurrentTopic(id);
-      dispatch(toggleShowModal({ show: true }));
-    },
-    []
-  );
+  const deleteTopic = (id) => {
+    setCurrentTopic(id);
+    dispatch(toggleShowModal({ show: true }));
+  };
 
-  const editTopic = React.useCallback(
-    (id) => () =>  {
-      setCurrentTopic(id);
-      setShow(true)
-    },
-    []
-  );
-
-  const columns = React.useMemo(
-    () => [
-      {
-        field: "id",
-        headerName: "ID",
-        type: "actions",
-        align: "left",
-        getActions: (params) => {
-          return [
-            <Tooltip title={params.row.id} color={"#108ee9"} key={"#108ee9"}>
-              {params.row.id}
-            </Tooltip>,
-          ];
-        },
-      },
-      {
-        field: "slug",
-        type: "actions",
-        headerName: "Slug",
-        getActions: (params) => {
-          return [
-            <Tooltip
-              title={params.row.slug}
-              color={"#108ee9"}
-              key={params.row._id}
-            >
-              <a href="" target="_blank">
-                {params.row.slug}
-              </a>
-            </Tooltip>,
-          ];
-        },
-      },
-      {
-        field: "title",
-        type: "string",
-        headerName: "Title of Topic",
-      },
-      {
-        field: "updatedAt",
-        type: "actions",
-        headerName: "Last Updated",
-        getActions: (params) => {
-          return [
-            <span className="text-center">
-              {new Date(params.row.updatedAt).toLocaleString()}
-            </span>,
-          ];
-        },
-      },
-      {
-        field: "status",
-        type: "actions",
-        headerName: "Status",
-        getActions: (params) => {
-          return [
-            <Tag
-              color={params.row.status === "Public" ? "success" : "processing"}
-            >
-              {params.row.status}
-            </Tag>,
-          ];
-        },
-      },
-      {
-        field: "actions",
-        headerName: "Action",
-        type: "actions",
-        getActions: (params) => [
-          <GridActionsCellItem
-            icon={<DeleteIcon />}
-            onClick={deleteTopic(params.id)}
-            label="Delete"
-          />,
-          <GridActionsCellItem
-            icon={<FontAwesomeIcon icon={faEye} className="me-2" />}
-            label="View Details"
-            showInMenu
-            onClick={editTopic(params.id)}
-          />,
-          <GridActionsCellItem
-            icon={<FontAwesomeIcon icon={faEdit} className="me-2" />}
-            label="Edit"
-            showInMenu
-            onClick={editTopic(params.id)}
-          />,
-        ],
-      },
-    ],
-    [deleteTopic]
-  );
+  const editTopic = (id) => {
+    setCurrentTopic(id);
+    setShow(true);
+  };
 
   const fetchAllTopic = async () => {
     try {
@@ -177,6 +80,8 @@ const ModulePage = () => {
           response?.data?.topic?.map((item) => ({
             ...item,
             id: item._id,
+            key: item._id,
+            total_of_section: item?.sections?.length,
           }))
         );
       }
@@ -226,23 +131,14 @@ const ModulePage = () => {
             <FontAwesomeIcon icon={faPlus} className="me-2" />
             New Topic
           </Button>
-          {/* <ButtonGroup>
-            <Button variant="outline-primary" size="sm">
-              Share
-            </Button>
-            <Button variant="outline-primary" size="sm">
-              Export
-            </Button>
-          </ButtonGroup> */}
         </div>
       </div>
 
       <div className="table-settings mb-4">
         <TableModule
-          title={columns}
-          deleteUser={deleteTopic}
+          deleteTopic={deleteTopic}
+          editTopic={editTopic}
           data={data}
-          handleShow={handleShow}
         />
       </div>
     </>

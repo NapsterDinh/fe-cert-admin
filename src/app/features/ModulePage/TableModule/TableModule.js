@@ -1,12 +1,11 @@
 import { SearchOutlined } from "@ant-design/icons";
 import { Card } from "@themesberg/react-bootstrap";
 import { Button, Input, Space, Table, Tag } from "antd";
-import { clientURL } from "configuration";
 import React, { useRef, useState } from "react";
 import Highlighter from "react-highlight-words";
-import "./TableLectures.css";
+import { clientURL } from "configuration";
 
-export const TableLectures = ({ data, editLecture, deleteLecture }) => {
+export const TableModule = ({ data, editTopic, deleteTopic }) => {
   const [searchText, setSearchText] = useState("");
   const [searchedColumn, setSearchedColumn] = useState("");
   const searchInput = useRef(null);
@@ -129,7 +128,7 @@ export const TableLectures = ({ data, editLecture, deleteLecture }) => {
       title: "Slug",
       dataIndex: "slug",
       key: "slug",
-      width: "15%",
+      width: "20%",
       render: (slug) => {
         return (
           <a href={`${clientURL}${slug}`} target={`_blank`}>
@@ -137,6 +136,18 @@ export const TableLectures = ({ data, editLecture, deleteLecture }) => {
           </a>
         );
       },
+    },
+    {
+      title: "Total of Section",
+      dataIndex: "total_of_section",
+      key: "total_of_section",
+      align: "center",
+      width: "10%",
+      sorter: (a, b) => {
+        return a.total_of_section < b.total_of_section;
+      },
+      sortDirections: ["descend", "ascend"],
+      ...getColumnSearchProps("total_of_section"),
     },
     {
       title: "Last Updated",
@@ -155,13 +166,13 @@ export const TableLectures = ({ data, editLecture, deleteLecture }) => {
       title: "Status",
       dataIndex: "status",
       key: "status",
-      width: "5%",
+      width: "10%",
       align: "center",
       ...getColumnSearchProps("status"),
       sorter: (a, b) => a.status < b.status,
       sortDirections: ["descend", "ascend"],
       render: (status) => {
-        let color = status === "Public" ? "geekblue" : "green";
+        let color = status === "public" ? "geekblue" : "green";
         return (
           <span>
             <Tag color={color} key={status}>
@@ -179,11 +190,11 @@ export const TableLectures = ({ data, editLecture, deleteLecture }) => {
       render: (_, record) => {
         return (
           <Space size="middle">
-            <Button onClick={() => editLecture(record._id)}>Edit</Button>
+            <Button onClick={() => editTopic(record._id)}>Edit</Button>
             <Button
               type="primary"
               danger
-              onClick={() => deleteLecture(record._id)}
+              onClick={() => deleteTopic(record._id)}
             >
               Delete
             </Button>
@@ -201,4 +212,4 @@ export const TableLectures = ({ data, editLecture, deleteLecture }) => {
   );
 };
 
-export default TableLectures;
+export default TableModule;
