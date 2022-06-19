@@ -1,15 +1,12 @@
-import React, {useState, useRef} from 'react';
-import { useLocation, useHistory } from 'react-router-dom';
-import { Row, Col, Breadcrumb, Button, ButtonGroup, Form, Card } from '@themesberg/react-bootstrap'
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-    faHome,
-    faAngleDoubleRight,
-    faPlus,
+    faAngleDoubleRight, faHome, faPlus
 } from "@fortawesome/free-solid-svg-icons";
-
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Breadcrumb, Button, ButtonGroup, Card, Col, Form, Row } from '@themesberg/react-bootstrap';
 import { Routes } from "app/routes";
-import JoditEditor from "jodit-react";
+import React, { useRef, useState } from 'react';
+import { useHistory, useLocation } from 'react-router-dom';
+
 
 const EditorTutorial = ({placeholder}) => {
     const location = useLocation()
@@ -78,19 +75,6 @@ const EditorTutorial = ({placeholder}) => {
                         type="text" placeholder="Slug" />
                     </Form.Group>
                     <Form.Label>Body</Form.Label>
-                    <JoditEditor
-                            ref={editor}
-                            value={content}
-                            config={
-                                {
-                                    minHeight: 400,
-                                    readonly: false
-                                }
-                            }
-                            tabIndex={1} // tabIndex of textarea
-                            onBlur={newContent => setContent(newContent)} // preferred to use only this option to update the content for performance reasons
-                            onChange={newContent => {}}
-                        />
                     <Form.Group className="mb-3 mt-3" controlId="tutorialDescription">
                         <Form.Label>Description</Form.Label>
                         <Form.Control as="textarea" placeholder="Enter description" />

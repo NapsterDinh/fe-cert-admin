@@ -127,13 +127,17 @@ export const TableLectures = ({ data, editLecture, deleteLecture }) => {
     },
     {
       title: "Slug",
-      dataIndex: "slug",
-      key: "slug",
-      width: "15%",
-      render: (slug) => {
+      key: "id",
+      width: "10%",
+      align: "center",
+      render: (_, record) => {
         return (
-          <a href={`${clientURL}${slug}`} target={`_blank`}>
-            {slug}
+          <a
+            rel="noreferrer"
+            href={`${clientURL}/lessons/${record.key}`}
+            target={"_blank"}
+          >
+            View on website
           </a>
         );
       },

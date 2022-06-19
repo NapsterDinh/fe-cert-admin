@@ -1,0 +1,8 @@
+.transfer-section {
+  display: flex;
+  justify-content: center;
+}
+.transfer-section .ant-transfer-list-with-pagination {
+  width: 400px;
+  min-height: 480px;
+}

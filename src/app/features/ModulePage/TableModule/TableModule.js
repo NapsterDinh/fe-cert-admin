@@ -129,10 +129,14 @@ export const TableModule = ({ data, editTopic, deleteTopic }) => {
       dataIndex: "slug",
       key: "slug",
       width: "20%",
-      render: (slug) => {
+      render: (_, record) => {
         return (
-          <a href={`${clientURL}${slug}`} target={`_blank`}>
-            {slug}
+          <a
+            rel="noreferrer"
+            href={`${clientURL}/topics/${record.key}`}
+            target={"_blank"}
+          >
+            View on website
           </a>
         );
       },

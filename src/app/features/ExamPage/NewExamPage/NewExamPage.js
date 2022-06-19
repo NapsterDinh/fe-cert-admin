@@ -15,25 +15,25 @@ import {
 } from "@themesberg/react-bootstrap";
 //components
 import { Select } from "antd";
+import Chart from "app/base/components/Chart/Chart";
 import EditorToolbar, {
   formats,
   modules,
 } from "app/base/components/Editor/EditorToolbar";
+import ModalConfirmDelete from "app/base/components/ModalConfirmDelete/ModalConfirmDelete";
 import { openNotificationWithIcon } from "app/base/components/Notification";
 import {
   editExam,
   getQuestionById as getQuestionByIDExam,
 } from "app/core/apis/exam";
+import { deleteQuestion as deleteQuestionAPI } from "app/core/apis/question";
 import { getAllTopic } from "app/core/apis/topic";
+import { groupBy } from "app/core/utils/arrayUtils";
 //data
 import { Routes } from "app/routes";
 import { ErrorMessage, Field, Formik } from "formik";
 import React, { useEffect, useState } from "react";
 import ReactQuill from "react-quill";
-import {
-  getQuestionById as getQuestionByIDQuestion,
-  deleteQuestion as deleteQuestionAPI,
-} from "app/core/apis/question";
 //components
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory, useParams } from "react-router-dom";
@@ -42,12 +42,12 @@ import * as Yup from "yup";
 import ModalAddNewExam from "../ModalAddNewExam/ModalNewExam";
 import TableQuestion from "../TablesQuestion/TablesQuestion";
 import ModalAddNewQuestion from "./ModalAddNewQuestion/ModalNewQuestion";
-import ModalConfirmDelete from "app/base/components/ModalConfirmDelete/ModalConfirmDelete";
+import AfternoonExamAdd from "./TypeExamAdd/AfternoonExamAdd";
+
 const { Option } = Select;
 const schema = Yup.object().shape({
   type: Yup.string().required("Type of exam is required"),
   title: Yup.string().required("Title is required"),
-  slug: Yup.string().required("Slug is required"),
   content: Yup.string().required("Description is required"),
   isPublic: Yup.string().oneOf(
     [`Public`, `Private`],
@@ -77,7 +77,6 @@ const NewExamPage = () => {
   const [data, setData] = useState({
     type: "exam",
     title: "",
-    slug: "",
     content: "",
     isPublic: "",
     time: 0,
@@ -140,7 +139,7 @@ const NewExamPage = () => {
   };
 
   const editQuestion = (id) => {
-    setCurrentQuestion(id);
+    setCurrentQuestion(data?.questions.find((item) => item._id === id));
     setShowModalQuestion(true);
   };
 
@@ -172,6 +171,7 @@ const NewExamPage = () => {
             ...item,
             key: item._id,
             id: item._id,
+            question: decodeURIComponent(escape(window.atob(item?.question))),
             isHasExplanation: item?.explanation !== "" ? "True" : "False",
             topic: topic.find((t) => t._id === item.topic)?.title,
           })),
@@ -201,11 +201,11 @@ const NewExamPage = () => {
                     .toISOString()
                     .substring(0, 10)
                 : "",
-
             questions: temp.map((item) => ({
               ...item,
               key: item._id,
               id: item._id,
+              question: decodeURIComponent(escape(window.atob(item?.question))),
               isHasExplanation: item?.explanation !== "" ? "True" : "False",
               topic: response2?.data?.topic.find((t) => t._id === item.topic)
                 ?.title,
@@ -218,17 +218,27 @@ const NewExamPage = () => {
     })();
   }, []);
 
-  const generatorSlug = (title) => {
-    if (title === "") {
-      return "";
-    } else {
-      return "/" + title?.toLowerCase().replaceAll(" ", "-");
-    }
-  };
-
   const handleCancelAddNewEdit = () => {
     window.location = "/exam-management";
   };
+
+  const countPercentTopicInExam = (dataParams) => {
+    if (dataParams !== undefined) {
+      const groupByIDTopic = groupBy(dataParams, "topic");
+
+      return {
+        labels: Object.keys(groupByIDTopic),
+        series: Object.entries(groupByIDTopic).map((item) =>
+          parseInt(item[1].length)
+        ),
+      };
+    }
+    return {
+      labels: ["Empty"],
+      series: [100],
+    };
+  };
+
   return (
     <>
       <ModalConfirmDelete
@@ -244,17 +254,21 @@ const NewExamPage = () => {
         handleClose={handleClose}
         handleSubmit={handleCancelAddNewEdit}
       />
-      <ModalAddNewQuestion
-        examId={idExam}
-        show={showModalQuestion}
-        handleClose={() => {
-          setCurrentQuestion("");
-          setShowModalQuestion(false);
-        }}
-        item={currentQuestion}
-        setItem={setCurrentQuestion}
-        fetchQuestionList={fetchAPIGetQuestionByID}
-      />
+      {topic !== "" && (
+        <ModalAddNewQuestion
+          examId={idExam}
+          show={showModalQuestion}
+          handleClose={() => {
+            setCurrentQuestion("");
+            setShowModalQuestion(false);
+          }}
+          topic={topic}
+          item={currentQuestion}
+          setItem={setCurrentQuestion}
+          fetchQuestionList={fetchAPIGetQuestionByID}
+        />
+      )}
+
       <Formik
         enableReinitialize
         initialValues={data}
@@ -322,7 +336,7 @@ const NewExamPage = () => {
                 </div>
               </div>
 
-              <div className="table-settings mb-4 ">
+              <div className="table-settings mb-4 " style={{ display: "none" }}>
                 <Card
                   border="light"
                   className="table-wrapper table-responsive shadow-sm"
@@ -330,7 +344,7 @@ const NewExamPage = () => {
                   <Card.Body className="pt-0 my-4">
                     <Row>
                       <Col lg={7}>
-                        <Form.Group
+                        {/* <Form.Group
                           className={
                             errors?.type && touched?.type && "error mb-4"
                           }
@@ -353,7 +367,7 @@ const NewExamPage = () => {
                               </Option>
                             </Select>
                           </div>
-                        </Form.Group>
+                        </Form.Group> */}
                         <Form.Group
                           className={
                             errors.title && touched.title && "error mb-4"
@@ -376,10 +390,6 @@ const NewExamPage = () => {
                               value={values.title}
                               onChange={(e) => {
                                 handleChange(e);
-                                setFieldValue(
-                                  "slug",
-                                  generatorSlug(e.target.value)
-                                );
                               }}
                               onBlur={handleBlur}
                               className={
@@ -388,35 +398,6 @@ const NewExamPage = () => {
                               name="title"
                               type="text"
                               placeholder="Enter title"
-                            />
-                          </InputGroup>
-                        </Form.Group>
-                        <Form.Group
-                          className={
-                            errors.slug && touched.slug && "error mb-4"
-                          }
-                          controlId="tutorialTitle"
-                        >
-                          <Form.Label>Slug</Form.Label>
-                          <ErrorMessage
-                            name="slug"
-                            component="div"
-                            className="invalid-feedback"
-                          />
-                          <InputGroup
-                            className={
-                              errors.slug && touched.slug && "error mb-3"
-                            }
-                          >
-                            <Form.Control
-                              value={values.slug}
-                              onChange={handleChange}
-                              onBlur={handleBlur}
-                              readOnly
-                              className={errors.slug && touched.slug && "error"}
-                              name="slug"
-                              type="text"
-                              placeholder="Enter slug"
                             />
                           </InputGroup>
                         </Form.Group>
@@ -713,6 +694,10 @@ const NewExamPage = () => {
                             />
                           </div>
                         </Form.Group> */}
+                        <Chart
+                          width={450}
+                          {...countPercentTopicInExam(data?.questions)}
+                        />
                       </Col>
                     </Row>
                     <Row>
@@ -733,6 +718,7 @@ const NewExamPage = () => {
                   </Card.Body>
                 </Card>
               </div>
+              <AfternoonExamAdd />
             </Form>
           );
         }}

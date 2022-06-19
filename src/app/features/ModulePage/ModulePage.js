@@ -1,27 +1,20 @@
 import {
-  faEdit,
-  faEye,
   faHome,
-  faPlus,
+  faPlus
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import DeleteIcon from "@mui/icons-material/Delete";
-import { GridActionsCellItem } from "@mui/x-data-grid";
-import { Breadcrumb, Button, ButtonGroup } from "@themesberg/react-bootstrap";
-import { Tag, Tooltip } from "antd";
+import { Breadcrumb, Button } from "@themesberg/react-bootstrap";
 import { ModalModule } from "app/base/components/Modal/Modal";
+import ModalConfirmDelete from "app/base/components/ModalConfirmDelete/ModalConfirmDelete";
 import { openNotificationWithIcon } from "app/base/components/Notification";
 import {
-  getQuestionById,
-  getAllTopic,
-  deleteTopic as deleteTopicAPI,
+  deleteTopic as deleteTopicAPI, getAllTopic
 } from "app/core/apis/topic";
 //data
 import { Routes } from "app/routes";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toggleShowModal, updateModalInfo } from "store/confirmDeleteReducer";
-import ModalConfirmDelete from "app/base/components/ModalConfirmDelete/ModalConfirmDelete";
 import TableModule from "./TableModule/TableModule";
 
 const ModulePage = () => {

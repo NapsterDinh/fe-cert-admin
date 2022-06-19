@@ -1,100 +1,40 @@
-import React from "react";
+import React, { useState } from "react";
 
-import { Transfer, Table, Tag } from "antd";
-import difference from "lodash/difference";
+import { Transfer } from "antd";
+import "./TransferSection.css";
 import "antd/dist/antd.css";
 
-// Customize Table Transfer
-const TableTransfer = ({ leftColumns, rightColumns, ...restProps }) => (
-  <Transfer {...restProps}>
-    {({
-      direction,
-      filteredItems,
-      onItemSelectAll,
-      onItemSelect,
-      selectedKeys: listSelectedKeys,
-      disabled: listDisabled,
-    }) => {
-      const columns = direction === "left" ? leftColumns : rightColumns;
+const TransferSection = ({ data, sections, setSections }) => {
+  console.log(sections);
+  const [selectedKeys, setSelectedKeys] = useState([]);
 
-      const rowSelection = {
-        getCheckboxProps: (item) => {
-          return { disabled: listDisabled || item.disabled };
-        },
-        onSelectAll(selected, selectedRows) {
-          const treeSelectedKeys = selectedRows
-            .filter((item) => !item.disabled)
-            .map(({ key }) => key);
-          const diffKeys = selected
-            ? difference(treeSelectedKeys, listSelectedKeys)
-            : difference(listSelectedKeys, treeSelectedKeys);
-          onItemSelectAll(diffKeys, selected);
-        },
-        onSelect({ key }, selected) {
-          onItemSelect(key, selected);
-        },
-        selectedRowKeys: listSelectedKeys,
-      };
-      return (
-        <Table
-          rowSelection={rowSelection}
-          columns={columns}
-          dataSource={filteredItems}
-          size="small"
-          style={{ pointerEvents: listDisabled ? "none" : null }}
-          onRow={({ key, disabled: itemDisabled }) => ({
-            onClick: () => {
-              if (itemDisabled || listDisabled) return;
-              onItemSelect(key, !listSelectedKeys.includes(key));
-            },
-          })}
-        />
-      );
-    }}
-  </Transfer>
-);
+  const onChange = (nextTargetKeys, direction, moveKeys) => {
+    console.log(nextTargetKeys);
+    setSections(nextTargetKeys);
+  };
 
-const leftTableColumns = [
-  {
-    dataIndex: "key",
-    title: "ID",
-  },
-  {
-    dataIndex: "title",
-    title: "Title",
-  },
-];
-const rightTableColumns = [
-  {
-    dataIndex: "key",
-    title: "ID",
-  },
-  {
-    dataIndex: "title",
-    title: "Title",
-  },
-];
-
-const TransferSection = ({ data, questions, setQuestions }) => {
-  const handleOnChange = (nextTargetKeys, direction, moveKeys) => {
-    setQuestions(nextTargetKeys);
+  const onSelectChange = (sourceSelectedKeys, targetSelectedKeys) => {
+    setSelectedKeys([...sourceSelectedKeys, ...targetSelectedKeys]);
   };
 
   return (
     <>
-      <TableTransfer
+      <Transfer
+        className="transfer-section"
         dataSource={data}
-        targetKeys={questions}
+        targetKeys={sections}
+        selectedKeys={selectedKeys}
         showSearch
-        onChange={handleOnChange}
+        onChange={onChange}
+        onSelectChange={onSelectChange}
         filterOption={(inputValue, item) => {
           return (
-            item.id?.toLowerCase().indexOf(inputValue) !== -1 ||
+            item._id?.toLowerCase().indexOf(inputValue) !== -1 ||
             item.title?.toLowerCase().search(inputValue) !== -1
           );
         }}
-        leftColumns={leftTableColumns}
-        rightColumns={rightTableColumns}
+        pagination
+        render={(item) => item.title}
       />
     </>
   );

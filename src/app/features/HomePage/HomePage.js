@@ -52,11 +52,11 @@ const HomePage = () => (
         component={Routes.DashboardPage.element}
       />
 
-      <RouteWithSidebar
+      {/* <RouteWithSidebar
         exact={Routes.QuestionPage.exact}
         path={Routes.QuestionPage.path}
         component={Routes.QuestionPage.element}
-      />
+      /> */}
 
       <RouteWithSidebar
         exact={Routes.ExamPage.exact}
@@ -91,6 +91,21 @@ const HomePage = () => (
         exact={Routes.NewSectionPage.exact}
         path={Routes.NewSectionPage.path}
         component={Routes.NewSectionPage.element}
+      />
+      <RouteWithSidebar
+        exact={Routes.ServicePage.exact}
+        path={Routes.ServicePage.path}
+        component={Routes.ServicePage.element}
+      />
+      <RouteWithSidebar
+        exact={Routes.StatementPage.exact}
+        path={Routes.StatementPage.path}
+        component={Routes.StatementPage.element}
+      />
+      <RouteWithSidebar
+        exact={Routes.UserPage.exact}
+        path={Routes.UserPage.path}
+        component={Routes.UserPage.element}
       />
 
       <Route component={NotFound} />

@@ -1,0 +1,19 @@
+.td-questions
+{
+    white-space: pre-wrap!important;
+}
+.btn-group .dropdown-menu.show
+{
+    transform: translate(-160px, 31px)!important;
+}
+.th-type, .th-dateCreated
+{
+    width: 15%;
+}
+.MuiDataGrid-root
+{
+    border: none!important;
+    margin-top: 10px;
+}
+
+

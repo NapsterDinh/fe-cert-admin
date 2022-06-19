@@ -11,6 +11,6 @@ const configuration = {
   }
 };
 
-export const clientURL = "http://localhost:3001"
+export const clientURL = "http://dev.fe-vietnam.vn:3000"
 
 export default configuration;

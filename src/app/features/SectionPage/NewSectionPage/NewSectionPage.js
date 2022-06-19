@@ -33,7 +33,6 @@ import * as Yup from "yup";
 
 const schema = Yup.object().shape({
   title: Yup.string().required("Title is required"),
-  slug: Yup.string().required("Slug is required"),
   status: Yup.string().oneOf(
     [`public`, `private`],
     "Selecting the status field is required"
@@ -57,7 +56,6 @@ const NewSectionPage = () => {
     const section = {
       ...data,
       title: values.title,
-      slug: values.slug,
       status: values.status,
       lessons: data?.lessons,
     };
@@ -70,14 +68,6 @@ const NewSectionPage = () => {
         openNotificationWithIcon("error", "Update section failed");
       }
     } catch (error) {}
-  };
-
-  const generatorSlug = (title) => {
-    if (title === "") {
-      return "";
-    } else {
-      return "/section/" + title?.toLowerCase().replaceAll(" ", "-");
-    }
   };
 
   const fetchSectionByID = async () => {
@@ -254,10 +244,6 @@ const NewSectionPage = () => {
                               value={values.title}
                               onChange={(e) => {
                                 handleChange(e);
-                                setFieldValue(
-                                  "slug",
-                                  generatorSlug(e.target.value)
-                                );
                               }}
                               onBlur={handleBlur}
                               className={
@@ -269,84 +255,46 @@ const NewSectionPage = () => {
                             />
                           </InputGroup>
                         </Form.Group>
-                        <Form.Group
+                      </Col>
+                      <Col lg={4} className="mx-5">
+                        <div
+                          style={{ marginTop: "2px" }}
                           className={
-                            errors.slug && touched.slug && "error mb-4"
+                            errors.status && touched.status && "error mb-4"
                           }
-                          controlId="tutorialTitle"
                         >
-                          <Form.Label>Slug</Form.Label>
+                          <Form.Label>Status</Form.Label>
+
+                          <div key={`inline-radio-status`} className="mb-3">
+                            <Form.Check
+                              type={`radio`}
+                              inline
+                              label="Public"
+                              id={`inline-radio-3`}
+                              value="public"
+                              checked={values.status === "public"}
+                              onChange={() => setFieldValue("status", "public")}
+                              name="status"
+                            />
+                            <Form.Check
+                              type={`radio`}
+                              inline
+                              label="Private"
+                              id={`inline-radio-5`}
+                              value="private"
+                              checked={values.status === "private"}
+                              onChange={() =>
+                                setFieldValue("status", "private")
+                              }
+                              name="status"
+                            />
+                          </div>
                           <ErrorMessage
-                            name="slug"
+                            name="status"
                             component="div"
                             className="invalid-feedback"
                           />
-                          <InputGroup
-                            className={
-                              errors.slug && touched.slug && "error mb-3"
-                            }
-                          >
-                            <Form.Control
-                              value={values.slug}
-                              onChange={handleChange}
-                              onBlur={handleBlur}
-                              readOnly
-                              className={errors.slug && touched.slug && "error"}
-                              name="slug"
-                              type="text"
-                              placeholder="Enter slug"
-                            />
-                          </InputGroup>
-                        </Form.Group>
-                      </Col>
-                      <Col lg={4} className="mx-5">
-                        <Form.Group
-                          className={
-                            "form-group mb-3 d-flex justify-content-between"
-                          }
-                          as={Col}
-                          controlId="formTitle"
-                        >
-                          <div
-                            className={
-                              errors.status && touched.status && "error mb-4"
-                            }
-                          >
-                            <Form.Label>Status</Form.Label>
-
-                            <div key={`inline-radio-status`} className="mb-3">
-                              <Form.Check
-                                type={`radio`}
-                                inline
-                                label="Public"
-                                id={`inline-radio-3`}
-                                value="public"
-                                checked={values.status === "public"}
-                                onChange={() =>
-                                  setFieldValue("status", "public")
-                                }
-                                name="status"
-                              />
-                              <Form.Check
-                                type={`radio`}
-                                inline
-                                label="Private"
-                                id={`inline-radio-5`}
-                                value="private"
-                                checked={values.status === "private"}
-                                onChange={() =>
-                                  setFieldValue("status", "private")
-                                }
-                                name="status"
-                              />
-                            </div>
-                            <ErrorMessage
-                              name="status"
-                              component="div"
-                              className="invalid-feedback"
-                            />
-                          </div>
-                        </Form.Group>
+                        </div>
                       </Col>
                     </Row>
                     <Row>

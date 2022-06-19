@@ -13,6 +13,8 @@ import EditorToolbar, {
 import ReactQuill from "react-quill";
 import { Select, message } from "antd";
 import { openNotificationWithIcon } from "app/base/components/Notification";
+import { getAllSection } from "app/core/apis/section";
+import { getAllLesson } from "app/core/apis/lessons";
 import {
   addNewQuestionWithExam,
   editQuestion,
@@ -31,9 +33,13 @@ const ModalAddNewQuestion = ({
   setItem,
   fetchQuestionList,
   examId,
+  topic,
 }) => {
-  const [topic, setTopic] = useState([]);
+  const [section, setSection] = useState([]);
+  const [lessons, setLessons] = useState([]);
   const [selectedTopicID, setSelectedTopicID] = useState("");
+  const [selectedSectionID, setSelectedSectionID] = useState("");
+  const [selectedLessonID, setSelectedLessonID] = useState("");
   const [question, setQuestion] = useState("");
   const [explanation, setExplanation] = useState("");
   const [choices, setChoices] = useState([]);
@@ -42,31 +48,23 @@ const ModalAddNewQuestion = ({
   useEffect(() => {
     (async () => {
       if (item !== "") {
-        try {
-          const response = await getQuestionByIDQuestion(item);
-          if (response.status === 200) {
-            setQuestion(
-              decodeURIComponent(
-                escape(window.atob(response?.data?.question[0].question))
-              )
-            );
-            setExplanation(
-              window.atob(response?.data?.question[0].explanation)
-            );
-            setChoices(response?.data?.question[0].choices);
-            setAnswer(response?.data?.question[0].answer);
-            setSelectedTopicID(response?.data?.question[0].topic);
-            setData(response?.data?.question[0]);
-          }
-        } catch (error) {
-          alert(error);
-        }
+        console.log(item);
+        setQuestion(item.question);
+        setExplanation(window.atob(item.explanation));
+        setChoices(item.choices);
+        setAnswer(item.answer);
+        setSelectedTopicID(topic?.find((t) => t.title === item.topic)._id);
+        setSelectedSectionID(item.section);
+        setSelectedLessonID(item.lesson);
+        setData(item);
       } else {
         setQuestion("");
         setExplanation("");
         setChoices([]);
         setAnswer("");
         setSelectedTopicID("");
+        setSelectedSectionID("");
+        setSelectedLessonID("");
         setData("");
       }
     })();
@@ -75,7 +73,6 @@ const ModalAddNewQuestion = ({
   const handleAddNewQuestion = async (e) => {
     e.preventDefault();
     const type = "single_choice";
-    console.log(selectedTopicID);
     if (item !== "") {
       try {
         let temp_answer = "";
@@ -111,7 +108,9 @@ const ModalAddNewQuestion = ({
           type: type,
           choices: temp_choices,
           answer: temp_answer,
-          topic: topic?.find((t) => t._id === selectedTopicID)._id,
+          topic: selectedTopicID,
+          section: selectedSectionID,
+          lesson: selectedLessonID,
         });
         if (response.status === 201) {
           await fetchQuestionList();
@@ -158,7 +157,9 @@ const ModalAddNewQuestion = ({
           type: type,
           choices: choices,
           answer: temp_answer,
-          topic: topic?.find((t) => t._id === selectedTopicID)._id,
+          topic: selectedTopicID,
+          section: selectedSectionID,
+          lesson: selectedLessonID,
         });
         setItem("");
 
@@ -187,13 +188,38 @@ const ModalAddNewQuestion = ({
 
   const handleChange = (value) => {
     setSelectedTopicID(value);
+    setSelectedSectionID("");
+    setSelectedLessonID("");
+  };
+
+  useEffect(() => {
+    if (selectedTopicID !== "") {
+      setSection(topic?.find((item) => item._id === selectedTopicID)?.sections);
+    }
+  }, [selectedTopicID]);
+
+  useEffect(() => {
+    if (selectedSectionID !== "") {
+      setLessons(
+        section?.find((item) => item._id === selectedSectionID)?.lessons
+      );
+    }
+  }, [selectedSectionID]);
+
+  const handleChangeSection = (value) => {
+    setSelectedSectionID(value);
+  };
+
+  const handleChangeLesson = (value) => {
+    setSelectedLessonID(value);
   };
 
   useEffect(() => {
     (async () => {
       try {
-        const response = await getAllTopic();
-        setTopic(response?.data?.topic);
+        const response1 = await getAllSection();
+
+        setSection(response1?.data?.topicSection);
       } catch (error) {}
     })();
   }, []);
@@ -209,6 +235,8 @@ const ModalAddNewQuestion = ({
           setChoices([]);
           setAnswer("");
           setSelectedTopicID("");
+          setSelectedSectionID("");
+          setSelectedLessonID("");
           setData("");
           handleClose();
         }}
@@ -276,7 +304,7 @@ const ModalAddNewQuestion = ({
                       }
                       as="textarea"
                       name="choices0"
-                      rows={2}
+                      rows={3}
                       placeholder="Answer A"
                     />
                   </Form.Group>
@@ -301,7 +329,7 @@ const ModalAddNewQuestion = ({
                       }
                       as="textarea"
                       name="choices1"
-                      rows={2}
+                      rows={3}
                       placeholder="Answer B"
                     />
                   </Form.Group>
@@ -325,7 +353,7 @@ const ModalAddNewQuestion = ({
                         choices !== undefined ? choices[2]?.label : ""
                       }
                       as="textarea"
-                      rows={2}
+                      rows={3}
                       name="choices2"
                       placeholder="Answer C"
                     />
@@ -351,7 +379,7 @@ const ModalAddNewQuestion = ({
                       }
                       as="textarea"
                       name="choices3"
-                      rows={2}
+                      rows={3}
                       placeholder="Answer D"
                     />
                   </Form.Group>
@@ -361,13 +389,38 @@ const ModalAddNewQuestion = ({
                     <Form.Label>Topic</Form.Label>
                     <Select
                       style={{ width: "300px" }}
-                      defaultValue={
-                        item !== "" &&
-                        topic?.find((t) => t._id === selectedTopicID)?._id
-                      }
+                      value={selectedTopicID}
                       onChange={handleChange}
                     >
                       {topic?.map((t) => (
+                        <Option key={t._id} value={t._id}>
+                          {t.title}
+                        </Option>
+                      ))}
+                    </Select>
+                  </Form.Group>
+                  <Form.Group className="mb-3" controlId="formDescription">
+                    <Form.Label>Section</Form.Label>
+                    <Select
+                      style={{ width: "300px" }}
+                      value={selectedSectionID}
+                      onChange={handleChangeSection}
+                    >
+                      {section?.map((t) => (
+                        <Option key={t._id} value={t._id}>
+                          {t.title}
+                        </Option>
+                      ))}
+                    </Select>
+                  </Form.Group>
+                  <Form.Group className="mb-3" controlId="formDescription">
+                    <Form.Label>Lessons</Form.Label>
+                    <Select
+                      style={{ width: "300px" }}
+                      value={selectedLessonID}
+                      onChange={handleChangeLesson}
+                    >
+                      {lessons?.map((t) => (
                         <Option key={t._id} value={t._id}>
                           {t.title}
                         </Option>
@@ -434,7 +487,7 @@ const ModalAddNewQuestion = ({
                       }
                       as="textarea"
                       name="choices0"
-                      rows={2}
+                      rows={3}
                       placeholder="Answer A"
                     />
                   </Form.Group>
@@ -459,7 +512,7 @@ const ModalAddNewQuestion = ({
                       }
                       as="textarea"
                       name="choices1"
-                      rows={2}
+                      rows={3}
                       placeholder="Answer B"
                     />
                   </Form.Group>
@@ -483,7 +536,7 @@ const ModalAddNewQuestion = ({
                         choices !== undefined ? choices[2]?.label : ""
                       }
                       as="textarea"
-                      rows={2}
+                      rows={3}
                       name="choices2"
                       placeholder="Answer C"
                     />
@@ -509,13 +562,13 @@ const ModalAddNewQuestion = ({
                       }
                       as="textarea"
                       name="choices3"
-                      rows={2}
+                      rows={3}
                       placeholder="Answer D"
                     />
                   </Form.Group>
                 </Col>
                 <Col lg={4}>
-                  <Form.Group className="mb-3" controlId="formDescription">
+                  <Form.Group className="mb-3" controlId="formDescriptions">
                     <Form.Label>Topic</Form.Label>
                     <Select
                       style={{ width: "300px" }}
@@ -526,6 +579,40 @@ const ModalAddNewQuestion = ({
                       onChange={handleChange}
                     >
                       {topic?.map((t) => (
+                        <Option key={t._id} value={t._id}>
+                          {t.title}
+                        </Option>
+                      ))}
+                    </Select>
+                  </Form.Group>
+                  <Form.Group className="mb-3" controlId="formDescription">
+                    <Form.Label>Section</Form.Label>
+                    <Select
+                      style={{ width: "300px" }}
+                      defaultValue={
+                        item !== "" &&
+                        section?.find((t) => t._id === selectedSectionID)?._id
+                      }
+                      onChange={handleChangeSection}
+                    >
+                      {section?.map((t) => (
+                        <Option key={t._id} value={t._id}>
+                          {t.title}
+                        </Option>
+                      ))}
+                    </Select>
+                  </Form.Group>
+                  <Form.Group className="mb-3" controlId="formDescription">
+                    <Form.Label>Lessons</Form.Label>
+                    <Select
+                      style={{ width: "300px" }}
+                      defaultValue={
+                        item !== "" &&
+                        lessons?.find((t) => t._id === selectedLessonID)?._id
+                      }
+                      onChange={handleChangeLesson}
+                    >
+                      {lessons?.map((t) => (
                         <Option key={t._id} value={t._id}>
                           {t.title}
                         </Option>
@@ -547,6 +634,8 @@ const ModalAddNewQuestion = ({
                 setChoices([]);
                 setAnswer("");
                 setSelectedTopicID("");
+                setSelectedSectionID("");
+                setSelectedLessonID("");
                 setData("");
               }}
             >

@@ -115,16 +115,16 @@ export const TableExam = ({ data, editExam, deleteExam }) => {
       ),
   });
   const columns = [
-    {
-      title: "Type",
-      dataIndex: "type",
-      key: "type",
-      width: "5%",
-      align: "center",
-      ...getColumnSearchProps("type"),
-      sorter: (a, b) => a.type < b.type,
-      sortDirections: ["descend", "ascend"],
-    },
+    // {
+    //   title: "Type",
+    //   dataIndex: "type",
+    //   key: "type",
+    //   width: "5%",
+    //   align: "center",
+    //   ...getColumnSearchProps("type"),
+    //   sorter: (a, b) => a.type < b.type,
+    //   sortDirections: ["descend", "ascend"],
+    // },
     {
       title: "Title",
       dataIndex: "title",
@@ -141,13 +141,26 @@ export const TableExam = ({ data, editExam, deleteExam }) => {
       dataIndex: "slug",
       key: "slug",
       width: "20%",
-      render: (slug) => {
+      render: (_, record) => {
         return (
-          <a href={`${clientURL}/exams${slug}`} target={`_blank`}>
-            {slug}
+          <a
+            rel="noreferrer"
+            href={`${clientURL}/exams/${record.key}`}
+            target={"_blank"}
+          >
+            View on website
           </a>
         );
       },
+    },
+    {
+      title: "Total of Questions",
+      dataIndex: "total_of_questions",
+      key: "topic",
+      width: "15%",
+      sorter: (a, b) => a.total_of_questions < b.total_of_questions,
+      sortDirections: ["descend", "ascend"],
+      ...getColumnSearchProps("total_of_questions"),
     },
     {
       title: "Last Updated",

@@ -1,22 +1,20 @@
 import {
   Button,
-  Card,
   Col,
   Form,
   InputGroup,
   Modal,
   Row,
 } from "@themesberg/react-bootstrap";
-import { addNewSection } from "app/core/apis/section";
-import React, { useEffect, useState } from "react";
 import { openNotificationWithIcon } from "app/base/components/Notification";
+import { addNewSection } from "app/core/apis/section";
+import { ErrorMessage, Formik } from "formik";
+import React from "react";
 import * as Yup from "yup";
-import { ErrorMessage, Formik, Field } from "formik";
-import './ModalAddNewSection.css'
+import "./ModalAddNewSection.css";
 
 const schema = Yup.object().shape({
   title: Yup.string().required("Title is required"),
-  slug: Yup.string().required("Slug is required"),
   status: Yup.string().oneOf(
     [`public`, `private`],
     "Selecting the status field is required"
@@ -27,7 +25,6 @@ const ModalAddNewSection = ({ show, handleClose, getAllSection }) => {
   const handleSaveSection = async (values, setSubmitting, resetForm) => {
     const section = {
       title: values.title.trim(),
-      slug: values.slug.trim(),
       status: values.status,
     };
 
@@ -48,14 +45,6 @@ const ModalAddNewSection = ({ show, handleClose, getAllSection }) => {
     }
   };
 
-  const generatorSlug = (title) => {
-    if (title === "") {
-      return "";
-    } else {
-      return "/section/" + title?.toLowerCase().replaceAll(" ", "-");
-    }
-  };
-
   return (
     <>
       <Modal
@@ -70,7 +59,6 @@ const ModalAddNewSection = ({ show, handleClose, getAllSection }) => {
           enableReinitialize
           initialValues={{
             title: "",
-            slug: "",
             status: "public",
           }}
           validationSchema={schema}
@@ -111,10 +99,6 @@ const ModalAddNewSection = ({ show, handleClose, getAllSection }) => {
                           value={values.title}
                           onChange={(e) => {
                             handleChange(e);
-                            setFieldValue(
-                              "slug",
-                              generatorSlug(e.target.value)
-                            );
                           }}
                           onBlur={handleBlur}
                           className={errors.title && touched.title && "error"}
@@ -125,32 +109,6 @@ const ModalAddNewSection = ({ show, handleClose, getAllSection }) => {
                       </InputGroup>
                       <ErrorMessage
                         name="title"
-                        component="div"
-                        className="invalid-feedback"
-                      />
-                    </Form.Group>
-                    <Form.Group
-                      className={errors.slug && touched.slug && "error mb-4"}
-                      controlId="tutorialTitle"
-                    >
-                      <Form.Label>Slug</Form.Label>
-                      <InputGroup
-                        className={errors.slug && touched.slug && "error mb-3"}
-                      >
-                        <Form.Control
-                          value={values.slug}
-                          onChange={handleChange}
-                          onBlur={handleBlur}
-                          readOnly
-                          className={errors.slug && touched.slug && "error"}
-                          name="slug"
-                          type="text"
-                          placeholder="Enter slug"
-                        />
-                      </InputGroup>
-
-                      <ErrorMessage
-                        name="slug"
                         component="div"
                         className="invalid-feedback"
                       />

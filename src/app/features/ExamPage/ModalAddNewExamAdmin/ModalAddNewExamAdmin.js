@@ -24,7 +24,6 @@ const { Option } = Select;
 const schema = Yup.object().shape({
   type: Yup.string().required("Type of exam is required"),
   title: Yup.string().required("Title is required"),
-  slug: Yup.string().required("Slug is required"),
   description: Yup.string().required("Description is required"),
   content: Yup.string().required("Description is required"),
   status: Yup.string().oneOf(
@@ -36,30 +35,20 @@ const schema = Yup.object().shape({
 const initialValues = {
   type: "exam",
   title: "",
-  slug: "",
   description: "",
   content: "",
-  status: "Public",
+  status: "Private",
 };
 
 const ModalAddNewExamAdmin = ({ show, handleClose, fetchAllExam }) => {
-  const generatorSlug = (title) => {
-    if (title === "") {
-      return "";
-    } else {
-      return "/" + title?.toLowerCase().replaceAll(" ", "-");
-    }
-  };
 
   const onHandleSubmit = async (values, setSubmitting, resetForm) => {
     try {
       const response = await addNewExam({
         type: values.type,
         title: values.title,
-        slug: values.slug,
-        description: values.description,
         content: window.btoa(unescape(encodeURIComponent(values.content))),
-        isPublic: values.status,
+        isPublic: 'Private',
       });
       if (response.status === 201) {
         await fetchAllExam();
@@ -107,8 +96,8 @@ const ModalAddNewExamAdmin = ({ show, handleClose, fetchAllExam }) => {
                 </Modal.Header>
                 <Modal.Body>
                   <Row>
-                    <Col lg={9} className="col-left">
-                      <Form.Group
+                    <Col className="col-left">
+                      {/* <Form.Group
                         className={errors.type && touched.type && "error mb-4"}
                         controlId="tutorialTitle"
                       >
@@ -129,7 +118,7 @@ const ModalAddNewExamAdmin = ({ show, handleClose, fetchAllExam }) => {
                             </Option>
                           </Select>
                         </div>
-                      </Form.Group>
+                      </Form.Group> */}
                       <Form.Group
                         className={
                           errors.title && touched.title && "error mb-4"
@@ -152,43 +141,12 @@ const ModalAddNewExamAdmin = ({ show, handleClose, fetchAllExam }) => {
                             value={values.title}
                             onChange={(e) => {
                               handleChange(e);
-                              setFieldValue(
-                                "slug",
-                                generatorSlug(e.target.value)
-                              );
                             }}
                             onBlur={handleBlur}
                             className={errors.title && touched.title && "error"}
                             name="title"
                             type="text"
                             placeholder="Enter title"
-                          />
-                        </InputGroup>
-                      </Form.Group>
-                      <Form.Group
-                        className={errors.slug && touched.slug && "error mb-4"}
-                        controlId="tutorialTitle"
-                      >
-                        <Form.Label>Slug</Form.Label>
-                        <ErrorMessage
-                          name="slug"
-                          component="div"
-                          className="invalid-feedback"
-                        />
-                        <InputGroup
-                          className={
-                            errors.slug && touched.slug && "error mb-3"
-                          }
-                        >
-                          <Form.Control
-                            value={values.slug}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                            readOnly
-                            className={errors.slug && touched.slug && "error"}
-                            name="slug"
-                            type="text"
-                            placeholder="Enter slug"
                           />
                         </InputGroup>
                       </Form.Group>
@@ -259,7 +217,7 @@ const ModalAddNewExamAdmin = ({ show, handleClose, fetchAllExam }) => {
                         </Field>
                       </Form.Group>
                     </Col>
-                    <Col lg={3}>
+                    {/* <Col lg={3}>
                       <Card className="mt-4">
                         <Card.Body>
                           <Form.Group
@@ -299,7 +257,7 @@ const ModalAddNewExamAdmin = ({ show, handleClose, fetchAllExam }) => {
                           </Form.Group>
                         </Card.Body>
                       </Card>
-                    </Col>
+                    </Col> */}
                   </Row>
                 </Modal.Body>
                 <Modal.Footer>

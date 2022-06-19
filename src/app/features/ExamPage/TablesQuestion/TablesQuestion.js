@@ -125,13 +125,13 @@ export const TableQuestion = ({ data, editQuestions, deleteQuestion }) => {
     //   sortDirections: ["descend", "ascend"],
     // },
     {
-      title: "ID",
-      dataIndex: "id",
+      title: "Question",
+      dataIndex: "question",
       key: "id",
       width: "20%",
-      sorter: (a, b) => a.id < b.id,
+      sorter: (a, b) => a.question < b.question,
       sortDirections: ["descend", "ascend"],
-      ...getColumnSearchProps("id"),
+      ...getColumnSearchProps("question"),
     },
     {
       title: "Topic",

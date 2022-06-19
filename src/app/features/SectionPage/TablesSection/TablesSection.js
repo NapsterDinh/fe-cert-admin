@@ -133,19 +133,6 @@ export const TableSection = ({ data, editSection, deleteSection }) => {
       ...getColumnSearchProps("title"),
     },
     {
-      title: "Slug",
-      dataIndex: "slug",
-      key: "slug",
-      width: "15%",
-      render: (slug) => {
-        return (
-          <a href={`${clientURL}${slug}`} target={`_blank`}>
-            {slug}
-          </a>
-        );
-      },
-    },
-    {
       title: "Total of Lessons",
       dataIndex: "total_of_lessons",
       key: "total_of_lessons",
@@ -180,7 +167,7 @@ export const TableSection = ({ data, editSection, deleteSection }) => {
       sorter: (a, b) => a.status < b.status,
       sortDirections: ["descend", "ascend"],
       render: (status) => {
-        let color = status === "Public" ? "geekblue" : "green";
+        let color = status === "public" ? "geekblue" : "green";
         return (
           <span>
             <Tag color={color} key={status}>

@@ -1,34 +1,28 @@
-import React, { useState } from "react";
-import SimpleBar from "simplebar-react";
-import { useLocation } from "react-router-dom";
-import { CSSTransition } from "react-transition-group";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
+  faBookOpen,
   faChartPie,
-  faCog,
   faHandHoldingUsd,
+  faMoneyCheck,
   faSignOutAlt,
   faTimes,
-  faInbox,
-  faBoxOpen,
   faUsers,
-  faMoneyCheck,
-  faBookOpen,
-  faQuestion
 } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  Nav,
-  Badge,
-  Image,
-  Button,
   Accordion,
+  Badge,
+  Button,
+  Image,
+  Nav,
   Navbar,
 } from "@themesberg/react-bootstrap";
-import { Link } from "react-router-dom";
-
 import { Routes } from "app/routes";
-import ReactHero from "../assets/img/technologies/react-hero-logo.svg";
+import React, { useState } from "react";
+import { Link, useLocation } from "react-router-dom";
+import { CSSTransition } from "react-transition-group";
+import SimpleBar from "simplebar-react";
 import ProfilePicture from "../assets/img/team/profile-picture-3.jpg";
+import ReactHero from "../assets/img/technologies/react-hero-logo.svg";
 
 const Sidebar = () => {
   const location = useLocation();
@@ -181,9 +175,20 @@ const Sidebar = () => {
               />
               <NavItem
                 title="User Management"
-                link="https://demo.themesberg.com/volt-pro-react/#/messages"
+                link={Routes.UserPage.path}
                 icon={faUsers}
               />
+              <NavItem
+                title="Service Management"
+                link={Routes.ServicePage.path}
+                icon={faUsers}
+              />
+              <NavItem
+                title="Statement Management"
+                link={Routes.StatementPage.path}
+                icon={faUsers}
+              />
+
               <CollapsableNavItem
                 eventKey="content/"
                 title="Content Management"

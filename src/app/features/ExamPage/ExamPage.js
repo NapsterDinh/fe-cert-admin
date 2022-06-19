@@ -1,7 +1,4 @@
-import {
-  faHome,
-  faPlus
-} from "@fortawesome/free-solid-svg-icons";
+import { faHome, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Breadcrumb, Button } from "@themesberg/react-bootstrap";
 import ModalConfirmDelete from "app/base/components/ModalConfirmDelete/ModalConfirmDelete";
@@ -59,13 +56,14 @@ const ExamPage = () => {
 
   const fetchAllExam = async () => {
     try {
-      const response = await getAllExam('exam');
+      const response = await getAllExam("exam");
       if (response.status === 200) {
         setData(
           response.data.exam.map((item) => ({
             ...item,
             id: item._id,
             key: item._id,
+            total_of_questions: item?.questions?.length,
           }))
         );
       }

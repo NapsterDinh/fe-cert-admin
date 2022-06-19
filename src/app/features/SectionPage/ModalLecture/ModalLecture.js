@@ -21,7 +21,6 @@ import "./ModalLecture.css";
 
 const schema = Yup.object().shape({
   title: Yup.string().required("Title is required"),
-  slug: Yup.string().required("Slug is required"),
   body: Yup.string().required("Body is required"),
   status: Yup.string().oneOf(
     [`public`, `private`],
@@ -40,7 +39,6 @@ const ModalLecture = ({
 }) => {
   const [data, setData] = useState({
     title: "",
-    slug: "",
     body: "",
     status: "public",
   });
@@ -58,7 +56,6 @@ const ModalLecture = ({
       } else {
         setData({
           title: "",
-          slug: "",
           body: "",
           status: "public",
         });
@@ -66,15 +63,6 @@ const ModalLecture = ({
     })();
   }, [selectedLecture]);
 
-  const generatorSlug = (title) => {
-    if (title === "") {
-      return "";
-    } else {
-      return (
-        dataSection?.slug + "#" + title?.toLowerCase().replaceAll(" ", "-")
-      );
-    }
-  };
 
   const onHandleSubmit = async (values, setSubmitting, resetForm) => {
     console.log(values);
@@ -83,7 +71,6 @@ const ModalLecture = ({
       if (selectedLecture === "") {
         response = await addNewLesson({
           title: values.title,
-          slug: values.slug,
           body: window.btoa(unescape(encodeURIComponent(values.body))),
           tableOfContent: generatorTablesContent(values.body)[0],
           status: values.status,
@@ -98,7 +85,6 @@ const ModalLecture = ({
         response = await editLesson({
           _id: selectedLecture,
           title: values.title,
-          slug: values.slug,
           body: window.btoa(unescape(encodeURIComponent(values.body))),
           tableOfContent: generatorTablesContent(values.body)[0],
           status: values.status,
@@ -195,10 +181,6 @@ const ModalLecture = ({
                             value={values.title}
                             onChange={(e) => {
                               handleChange(e);
-                              setFieldValue(
-                                "slug",
-                                generatorSlug(e.target.value)
-                              );
                             }}
                             onBlur={handleBlur}
                             className={errors.title && touched.title && "error"}
@@ -209,34 +191,6 @@ const ModalLecture = ({
                         </InputGroup>
                         <ErrorMessage
                           name="title"
-                          component="div"
-                          className="invalid-feedback"
-                        />
-                      </Form.Group>
-                      <Form.Group
-                        className={errors.slug && touched.slug && "error mb-4"}
-                        controlId="tutorialTitle"
-                      >
-                        <Form.Label>Slug</Form.Label>
-                        <InputGroup
-                          className={
-                            errors.slug && touched.slug && "error mb-3"
-                          }
-                        >
-                          <Form.Control
-                            value={values.slug}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                            readOnly
-                            className={errors.slug && touched.slug && "error"}
-                            name="slug"
-                            type="text"
-                            placeholder="Enter slug"
-                          />
-                        </InputGroup>
-
-                        <ErrorMessage
-                          name="slug"
                           component="div"
                           className="invalid-feedback"
                         />

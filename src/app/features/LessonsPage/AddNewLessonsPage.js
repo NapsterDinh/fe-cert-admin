@@ -1,23 +1,15 @@
-import React, { useState, useRef } from "react";
-import { useLocation, useHistory } from "react-router-dom";
 import {
-  Row,
-  Col,
-  Breadcrumb,
-  Button,
-  ButtonGroup,
-  Form,
-  Card,
-} from "@themesberg/react-bootstrap";
+  faAngleDoubleRight, faHome, faPlus
+} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faHome,
-  faAngleDoubleRight,
-  faPlus,
-} from "@fortawesome/free-solid-svg-icons";
-
+  Breadcrumb,
+  Button
+} from "@themesberg/react-bootstrap";
 import { Routes } from "app/routes";
-import JoditEditor from "jodit-react";
+import React, { useRef, useState } from "react";
+import { useHistory, useLocation } from "react-router-dom";
+
 
 const AddNewLessonPage = ({ placeholder }) => {
   const location = useLocation();

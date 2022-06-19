@@ -1,5 +1,5 @@
 
-import { faBell, faSearch, faSignOutAlt } from "@fortawesome/free-solid-svg-icons";
+import { faSearch, faSignOutAlt } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Col, Container, Dropdown, Form, Image, InputGroup, ListGroup, Nav, Navbar, Row } from '@themesberg/react-bootstrap';
 import configuration from "configuration";
@@ -13,8 +13,8 @@ import Profile3 from "../assets/img/team/profile-picture-3.jpg";
 const NavBar = (props) => {
   const [notifications, setNotifications] = useState(NOTIFICATIONS_DATA);
   const areNotificationsRead = notifications.reduce((acc, notif) => acc && notif.read, true);
-  const user = useSelector(state => state.persist.user.user)
-
+  const user = useSelector(state => state.persist.user.user.user)
+  console.log(user);
   const dispatch =  useDispatch()
   const history = useHistory()
   const markNotificationsAsRead = () => {
