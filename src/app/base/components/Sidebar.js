@@ -168,11 +168,11 @@ const Sidebar = () => {
               </Nav.Link>
             </div>
             <Nav className="flex-column pt-3 pt-md-0">
-              <NavItem
+              {/* <NavItem
                 title="Overview"
                 link={Routes.DashboardPage.path}
                 icon={faChartPie}
-              />
+              /> */}
               <NavItem
                 title="User Management"
                 link={Routes.UserPage.path}
@@ -183,11 +183,11 @@ const Sidebar = () => {
                 link={Routes.ServicePage.path}
                 icon={faUsers}
               />
-              <NavItem
+              {/* <NavItem
                 title="Statement Management"
                 link={Routes.StatementPage.path}
                 icon={faUsers}
-              />
+              /> */}
 
               <CollapsableNavItem
                 eventKey="content/"

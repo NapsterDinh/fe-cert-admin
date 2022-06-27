@@ -50,12 +50,12 @@ const LoginPage = () => {
 
     if (result.status === 200) {
       //set token
-      if (result.data?.user?.role?.name !== "admin") {
+      if (result.data?.user?.user?.role?.name !== "admin") {
         setError("You has no permission to access to this page");
       } else {
         //set token
         configuration.setApiRequestToken(result.data.tokens);
-        dispatch(updateUser(result.data));
+        dispatch(updateUser(result.data?.user));
         if (location?.state !== undefined) {
           history.push(`${location.state.from}${location.state.search}`);
         } else {

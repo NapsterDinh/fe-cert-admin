@@ -53,10 +53,11 @@ const StatementPage = React.lazy(() =>
   import("app/features/StatementPage/StatementPage")
 );
 
-const UserPage = React.lazy(() =>
-  import("app/features/UserPage/UserPage")
-);
+const UserPage = React.lazy(() => import("app/features/UserPage/UserPage"));
 
+const NewModulePage = React.lazy(() =>
+  import("app/features/ModulePage/NewModulePage/NewModulePage")
+);
 
 export const Routes = {
   // pages
@@ -97,6 +98,12 @@ export const Routes = {
     exact: true,
     name: "Topic Management",
     element: ModulePage,
+  },
+  NewModulePage: {
+    path: "/topic-management/:id",
+    exact: true,
+    name: "Edit topic",
+    element: NewModulePage,
   },
   DetailModule: {
     path: "/topic/:id/document",

@@ -154,6 +154,19 @@ export const TableModule = ({ data, editTopic, deleteTopic }) => {
       ...getColumnSearchProps("total_of_section"),
     },
     {
+      title: "Created At",
+      dataIndex: "createdAt",
+      key: "createdAt",
+      width: "10%",
+      align: "center",
+      ...getColumnSearchProps("createdAt"),
+      sorter: (a, b) => new Date(a.createdAt) < new Date(b.createdAt),
+      sortDirections: ["descend", "ascend"],
+      render: (createdAt) => {
+        return <span>{new Date(createdAt).toLocaleString()}</span>;
+      },
+    },
+    {
       title: "Last Updated",
       dataIndex: "updatedAt",
       key: "updatedAt",
@@ -194,12 +207,8 @@ export const TableModule = ({ data, editTopic, deleteTopic }) => {
       render: (_, record) => {
         return (
           <Space size="middle">
-            <Button onClick={() => editTopic(record._id)}>Edit</Button>
-            <Button
-              type="primary"
-              danger
-              onClick={() => deleteTopic(record._id)}
-            >
+            <Button onClick={() => editTopic(record)}>Edit</Button>
+            <Button type="primary" danger onClick={() => deleteTopic(record)}>
               Delete
             </Button>
           </Space>

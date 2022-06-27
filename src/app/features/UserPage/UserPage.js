@@ -2,7 +2,7 @@ import { faHome, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Breadcrumb, Button } from "@themesberg/react-bootstrap";
 import { openNotificationWithIcon } from "app/base/components/Notification";
-import { deleteExam, getAllExam } from "app/core/apis/exam";
+import { getAllUsers } from "app/core/apis/user";
 //data
 import { Routes } from "app/routes";
 import React, { useEffect, useState } from "react";
@@ -28,40 +28,14 @@ const UserPage = () => {
     })
   );
 
-  const handleDeleteExam = async () => {
-    try {
-      const response = await deleteExam({
-        _id: currentQuestion,
-      });
-      if (response.status === 200) {
-        await fetchAllExam();
-        dispatch(toggleShowModal({ show: false }));
-        openNotificationWithIcon("success", "Delete service successfully");
-      }
-    } catch (error) {
-      alert(error);
-    }
-  };
-
-  const deleteUser = (id) => {
-    setCurrentQuestion(id);
-    dispatch(toggleShowModal({ show: true }));
-  };
-
-  const editQuestion = (id) => {
-    window.location = `/exam-management/${id}`;
-  };
-
   const fetchAllExam = async () => {
     try {
-      const response = await getAllExam("exam");
+      const response = await getAllUsers();
       if (response.status === 200) {
         setData(
-          response.data.exam.map((item) => ({
+          response.data.users.map((item) => ({
             ...item,
             id: item._id,
-            key: item._id,
-            total_of_questions: item?.questions?.length,
           }))
         );
       }
@@ -101,12 +75,7 @@ const UserPage = () => {
       </div>
 
       <div className="table-settings mb-4">
-        <TablesUser
-          deleteExam={deleteUser}
-          editExam={editQuestion}
-          data={data}
-          handleShow={handleShow}
-        />
+        <TablesUser data={data} handleShow={handleShow} />
       </div>
     </>
   );

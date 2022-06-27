@@ -6,8 +6,7 @@ import Highlighter from "react-highlight-words";
 import { clientURL } from "configuration";
 import "./TableExam.css";
 
-export const TableExam = ({ data, editExam, deleteExam }) => {
-  console.log(data);
+export const TableExam = ({ data, editExam, deleteExam, showDetail }) => {
   const [searchText, setSearchText] = useState("");
   const [searchedColumn, setSearchedColumn] = useState("");
   const searchInput = useRef(null);
@@ -115,16 +114,6 @@ export const TableExam = ({ data, editExam, deleteExam }) => {
       ),
   });
   const columns = [
-    // {
-    //   title: "Type",
-    //   dataIndex: "type",
-    //   key: "type",
-    //   width: "5%",
-    //   align: "center",
-    //   ...getColumnSearchProps("type"),
-    //   sorter: (a, b) => a.type < b.type,
-    //   sortDirections: ["descend", "ascend"],
-    // },
     {
       title: "Title",
       dataIndex: "title",
@@ -137,30 +126,47 @@ export const TableExam = ({ data, editExam, deleteExam }) => {
       ...getColumnSearchProps("title"),
     },
     {
-      title: "Slug",
-      dataIndex: "slug",
-      key: "slug",
-      width: "20%",
-      render: (_, record) => {
-        return (
-          <a
-            rel="noreferrer"
-            href={`${clientURL}/exams/${record.key}`}
-            target={"_blank"}
-          >
-            View on website
-          </a>
-        );
-      },
+      title: "Number of Examinees",
+      dataIndex: "numberExaminees",
+      key: "numberExaminees",
+      width: "15%",
+      align: "center",
+      sorter: (a, b) => a.numberExaminees < b.numberExaminees,
+      sortDirections: ["descend", "ascend"],
+      ...getColumnSearchProps("numberExaminees"),
+    },
+    {
+      title: "Pass rate",
+      dataIndex: "passRate",
+      key: "passRate",
+      width: "15%",
+      align: "center",
+      sorter: (a, b) => a.passRate < b.passRate,
+      sortDirections: ["descend", "ascend"],
+      ...getColumnSearchProps("passRate"),
     },
     {
       title: "Total of Questions",
       dataIndex: "total_of_questions",
       key: "topic",
       width: "15%",
+      align: "center",
       sorter: (a, b) => a.total_of_questions < b.total_of_questions,
       sortDirections: ["descend", "ascend"],
       ...getColumnSearchProps("total_of_questions"),
+    },
+    {
+      title: "Created At",
+      dataIndex: "createdAt",
+      key: "createdAt",
+      width: "10%",
+      align: "center",
+      ...getColumnSearchProps("createdAt"),
+      sorter: (a, b) => new Date(a.createdAt) < new Date(b.createdAt),
+      sortDirections: ["descend", "ascend"],
+      render: (createdAt) => {
+        return <span>{new Date(createdAt).toLocaleString()}</span>;
+      },
     },
     {
       title: "Last Updated",
@@ -203,6 +209,7 @@ export const TableExam = ({ data, editExam, deleteExam }) => {
       render: (_, record) => {
         return (
           <Space size="middle">
+            {/* <Button onClick={() => showDetail(record)}>View Detail</Button> */}
             <Button onClick={() => editExam(record._id)}>Edit</Button>
             <Button
               type="primary"

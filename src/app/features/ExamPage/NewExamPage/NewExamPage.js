@@ -45,26 +45,7 @@ import ModalAddNewQuestion from "./ModalAddNewQuestion/ModalNewQuestion";
 import AfternoonExamAdd from "./TypeExamAdd/AfternoonExamAdd";
 
 const { Option } = Select;
-const schema = Yup.object().shape({
-  type: Yup.string().required("Type of exam is required"),
-  title: Yup.string().required("Title is required"),
-  content: Yup.string().required("Description is required"),
-  isPublic: Yup.string().oneOf(
-    [`Public`, `Private`],
-    "Selecting the status field is required"
-  ),
-  time: Yup.number()
-    .min(60, "Time is more than 60 seconds")
-    .max(108000, "Time is less than 108000 seconds")
-    .required("Time is requried"),
-  totalQuestions: Yup.number()
-    .min(10, "Total questions is more than 10")
-    .max(100, "Total questions is less than 100")
-    .required("Total questions is requried"),
-  eventDate: Yup.string().required("Event Date is required"),
-  isSessionMorning: Yup.boolean().oneOf([true, false]).required(),
-  questions: Yup.array(),
-});
+const schema = Yup.object().shape();
 
 const NewExamPage = () => {
   const history = useHistory();
@@ -79,8 +60,8 @@ const NewExamPage = () => {
     title: "",
     content: "",
     isPublic: "",
-    time: 0,
-    totalQuestions: 0,
+    time: 9000,
+    totalQuestions: 80,
     eventDate: "",
     isSessionMorning: true,
     questions: [],
@@ -336,7 +317,7 @@ const NewExamPage = () => {
                 </div>
               </div>
 
-              <div className="table-settings mb-4 " style={{ display: "none" }}>
+              <div className="table-settings mb-4 ">
                 <Card
                   border="light"
                   className="table-wrapper table-responsive shadow-sm"
@@ -438,7 +419,8 @@ const NewExamPage = () => {
                           as={Col}
                           controlId="formTitle"
                         >
-                          <div
+                          <Col
+                            lg={5}
                             className={
                               errors.isPublic &&
                               touched.isPublic &&
@@ -478,8 +460,9 @@ const NewExamPage = () => {
                               component="div"
                               className="invalid-feedback"
                             />
-                          </div>
-                          <div
+                          </Col>
+                          <Col
+                            lg={5}
                             className={
                               errors.isSessionMorning &&
                               touched.isSessionMorning &&
@@ -507,6 +490,7 @@ const NewExamPage = () => {
                               <Form.Check
                                 type={`radio`}
                                 inline
+                                disabled
                                 label="Afternoon"
                                 id={`inline-radio-12`}
                                 value="Afternoon"
@@ -525,7 +509,7 @@ const NewExamPage = () => {
                               component="div"
                               className="invalid-feedback"
                             />
-                          </div>
+                          </Col>
                         </Form.Group>
                         <Form.Group
                           className={
@@ -534,7 +518,8 @@ const NewExamPage = () => {
                           as={Col}
                           controlId="formTitle"
                         >
-                          <div
+                          <Col
+                            lg={5}
                             className={
                               errors.time && touched.time && "error mb-4"
                             }
@@ -543,6 +528,7 @@ const NewExamPage = () => {
 
                             <InputGroup>
                               <Form.Control
+                                disabled
                                 value={values.time}
                                 onChange={handleChange}
                                 onBlur={handleBlur}
@@ -555,39 +541,9 @@ const NewExamPage = () => {
                               component="div"
                               className="invalid-feedback"
                             />
-                          </div>
-
-                          <div
-                            className={
-                              errors.totalQuestions &&
-                              touched.totalQuestions &&
-                              "error mb-4"
-                            }
-                          >
-                            <Form.Label>Total Questions</Form.Label>
-
-                            <InputGroup>
-                              <Form.Control
-                                name="totalQuestions"
-                                value={values.totalQuestions}
-                                onChange={handleChange}
-                                onBlur={handleBlur}
-                                type="text"
-                              />
-                            </InputGroup>
-                            <ErrorMessage
-                              name="totalQuestions"
-                              component="div"
-                              className="invalid-feedback"
-                            />
-                          </div>
-                        </Form.Group>
-                        <Form.Group
-                          className={"form-group mb-3 d-flex"}
-                          as={Col}
-                          controlId="formTitle"
-                        >
-                          <div
+                          </Col>
+                          <Col
+                            lg={5}
                             className={
                               errors.eventDate &&
                               touched.eventDate &&
@@ -610,94 +566,61 @@ const NewExamPage = () => {
                               component="div"
                               className="invalid-feedback"
                             />
-                          </div>
+                          </Col>
                         </Form.Group>
-                        {/* <Form.Group
+                        <Form.Group
                           className={"form-group mb-3 d-flex"}
                           as={Col}
                           controlId="formTitle"
                         >
-                          <div className="mr-3">
-                            <Form.Label>Event Location</Form.Label>
-                            <InputGroup>
-                              <Form.Control
-                                defaultValue={data?.location}
-                                name="location"
-                                type="text"
-                              />
-                            </InputGroup>
-                          </div>
+                          <Col
+                            lg={5}
+                            className={
+                              errors.totalQuestions &&
+                              touched.totalQuestions &&
+                              "error mb-4"
+                            }
+                          >
+                            <Form.Label>Total Questions</Form.Label>
 
-                          <div className="mx-4">
-                            <Form.Label>Event date</Form.Label>
                             <InputGroup>
                               <Form.Control
-                                value={dateEvent}
-                                onChange={(e) => {
-                                  setDateEvent(e.target.value);
-                                }}
-                                name="eventDate"
-                                type="date"
+                                disabled
+                                name="totalQuestions"
+                                value={values.totalQuestions}
+                                onChange={handleChange}
+                                onBlur={handleBlur}
+                                type="text"
                               />
                             </InputGroup>
-                          </div>
+                            <ErrorMessage
+                              name="totalQuestions"
+                              component="div"
+                              className="invalid-feedback"
+                            />
+                          </Col>
                         </Form.Group>
                         <Form.Group
                           className={"form-group mb-3 d-flex"}
                           as={Col}
                           controlId="formTitle"
                         >
-                          <div className="mr-3">
-                            <Form.Label>Max total test per user</Form.Label>
-                            <InputGroup>
-                              <Form.Control
-                                name="maxTotalTests"
-                                defaultValue={data?.maxTotalTests}
-                                type="text"
-                              />
-                            </InputGroup>
-                          </div>
+                          <Col lg={5}>
+                            <Form.Label>Number of Examinees: </Form.Label>
+                            <p>{data?.numberExaminees}</p>
+                          </Col>
                         </Form.Group>
-                        <Form.Group
-                          className={"form-group mb-3 d-flex mt-3"}
-                          as={Col}
-                          controlId="formTitle"
-                        >
-                          <div key={`inline-checkbox1`} className="mb-3">
-                            <Form.Check
-                              inline
-                              label="Show right Answer"
-                              name="hasShowRightAnswer"
-                              defaultChecked={data?.hasShowRightAnswer}
-                              type="checkbox"
-                              id={`inline-radio-1`}
+                        {data?.questions?.length > 0 && (
+                          <>
+                            <Form.Label>
+                              Statistic of topic questions:{" "}
+                            </Form.Label>
+                            <Chart
+                              width={450}
+                              {...countPercentTopicInExam(data?.questions)}
                             />
-                          </div>
-                          <div key={`inline-checkbox2`} className="mb-3">
-                            <Form.Check
-                              inline
-                              label="Show explanation"
-                              name="hasShowExplanation"
-                              defaultChecked={data?.hasShowExplanation}
-                              type="checkbox"
-                              id={`inline-radio-11`}
-                            />
-                          </div>
-                          <div key={`inline-checkbox3`} className="mb-3">
-                            <Form.Check
-                              inline
-                              label="Show Ranking"
-                              defaultChecked={data?.showRanking}
-                              name="showRanking"
-                              type="checkbox"
-                              id={`inline-radio-13`}
-                            />
-                          </div>
-                        </Form.Group> */}
-                        <Chart
-                          width={450}
-                          {...countPercentTopicInExam(data?.questions)}
-                        />
+                          </>
+                        )}
                       </Col>
                     </Row>
                     <Row>
@@ -718,7 +641,7 @@ const NewExamPage = () => {
                   </Card.Body>
                 </Card>
               </div>
-              <AfternoonExamAdd />
+              {/* <AfternoonExamAdd /> */}
             </Form>
           );
         }}

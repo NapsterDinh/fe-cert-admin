@@ -5,7 +5,6 @@ import "./TransferSection.css";
 import "antd/dist/antd.css";
 
 const TransferSection = ({ data, sections, setSections }) => {
-  console.log(sections);
   const [selectedKeys, setSelectedKeys] = useState([]);
 
   const onChange = (nextTargetKeys, direction, moveKeys) => {

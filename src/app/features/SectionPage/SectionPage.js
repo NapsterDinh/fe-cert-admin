@@ -14,11 +14,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { toggleShowModal, updateModalInfo } from "store/confirmDeleteReducer";
 import ModalAddNewSection from "./ModalAddNewSection/ModalAddNewSection";
 import TableSection from "./TablesSection/TablesSection";
-
+import { getAllTopic } from "app/core/apis/topic";
 const SectionPage = () => {
   const [data, setData] = useState([]);
   const [show, setShow] = useState(false);
-
+  const [topic, setTopic] = React.useState([]);
   const modalConfirmDelete = useSelector((state) => state.confirmDelete);
   const dispatch = useDispatch();
   const handleClose = () => setShow(false);
@@ -65,12 +65,19 @@ const SectionPage = () => {
       const response = await getAllSectionAPI();
       if (response.status === 200) {
         setData(
-          response?.data?.topicSection?.map((item) => ({
-            ...item,
-            id: item._id,
-            key: item._id,
-            total_of_lessons: item.lessons.length,
-          }))
+          response?.data?.topicSection
+            ?.map((item) => ({
+              ...item,
+              id: item._id,
+              key: item._id,
+              total_of_lessons: item.lessons.length,
+              topic: item?.topic?.title,
+            }))
+            ?.sort(
+              (a, b) =>
+                new Date(b.createdAt).getTime() -
+                new Date(a.createdAt).getTime()
+            )
         );
       }
     } catch (error) {}
@@ -79,6 +86,10 @@ const SectionPage = () => {
   useEffect(() => {
     (async () => {
       await getAllSection();
+      try {
+        const response2 = await getAllTopic();
+        setTopic(response2?.data?.topic);
+      } catch (error) {}
     })();
   }, []);
 
@@ -90,6 +101,7 @@ const SectionPage = () => {
         {...modalConfirmDelete}
       />
       <ModalAddNewSection
+        topic={topic}
         show={show}
         handleClose={handleClose}
         getAllSection={getAllSection}
@@ -123,7 +135,10 @@ const SectionPage = () => {
         <TableSection
           deleteSection={deleteSection}
           editSection={editSection}
-          data={data}
+          data={data?.sort(
+            (a, b) =>
+              new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+          )}
         />
       </div>
     </>

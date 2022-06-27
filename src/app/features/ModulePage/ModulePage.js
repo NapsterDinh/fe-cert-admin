@@ -1,14 +1,12 @@
-import {
-  faHome,
-  faPlus
-} from "@fortawesome/free-solid-svg-icons";
+import { faHome, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Breadcrumb, Button } from "@themesberg/react-bootstrap";
 import { ModalModule } from "app/base/components/Modal/Modal";
 import ModalConfirmDelete from "app/base/components/ModalConfirmDelete/ModalConfirmDelete";
 import { openNotificationWithIcon } from "app/base/components/Notification";
 import {
-  deleteTopic as deleteTopicAPI, getAllTopic
+  deleteTopic as deleteTopicAPI,
+  getAllTopic,
 } from "app/core/apis/topic";
 //data
 import { Routes } from "app/routes";
@@ -42,7 +40,7 @@ const ModulePage = () => {
   const handleDeleteTopic = async () => {
     try {
       const response = await deleteTopicAPI({
-        _id: currentTopic,
+        _id: currentTopic?._id,
       });
       if (response.status === 200) {
         await fetchAllTopic();
@@ -55,13 +53,13 @@ const ModulePage = () => {
     }
   };
 
-  const deleteTopic = (id) => {
-    setCurrentTopic(id);
+  const deleteTopic = (item) => {
+    setCurrentTopic(item);
     dispatch(toggleShowModal({ show: true }));
   };
 
-  const editTopic = (id) => {
-    setCurrentTopic(id);
+  const editTopic = (item) => {
+    setCurrentTopic(item);
     setShow(true);
   };
 
@@ -70,12 +68,18 @@ const ModulePage = () => {
       const response = await getAllTopic();
       if (response.status === 200) {
         setData(
-          response?.data?.topic?.map((item) => ({
-            ...item,
-            id: item._id,
-            key: item._id,
-            total_of_section: item?.sections?.length,
-          }))
+          response?.data?.topic
+            ?.map((item) => ({
+              ...item,
+              id: item._id,
+              key: item._id,
+              total_of_section: item?.sections?.length,
+            }))
+            ?.sort(
+              (a, b) =>
+                new Date(b.createdAt).getTime() -
+                new Date(a.createdAt).getTime()
+            )
         );
       }
     } catch (error) {}

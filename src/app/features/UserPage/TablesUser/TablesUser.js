@@ -4,6 +4,7 @@ import { Button, Input, Space, Table, Tag } from "antd";
 import React, { useRef, useState } from "react";
 import Highlighter from "react-highlight-words";
 import { clientURL } from "configuration";
+import { Switch } from "react-router-dom";
 import "./TablesUser.css";
 
 export const TablesUser = ({ data, editExam, deleteExam }) => {
@@ -114,81 +115,63 @@ export const TablesUser = ({ data, editExam, deleteExam }) => {
       ),
   });
   const columns = [
-    // {
-    //   title: "Type",
-    //   dataIndex: "type",
-    //   key: "type",
-    //   width: "5%",
-    //   align: "center",
-    //   ...getColumnSearchProps("type"),
-    //   sorter: (a, b) => a.type < b.type,
-    //   sortDirections: ["descend", "ascend"],
-    // },
     {
-      title: "Title",
-      dataIndex: "title",
-      key: "title",
+      title: "Name",
+      dataIndex: "name",
+      key: "name",
       width: "20%",
       sorter: (a, b) => {
-        return a.title < b.title;
+        return a.name < b.name;
       },
       sortDirections: ["descend", "ascend"],
-      ...getColumnSearchProps("title"),
+      ...getColumnSearchProps("name"),
     },
     {
-      title: "Slug",
-      dataIndex: "slug",
-      key: "slug",
+      title: "Email",
+      dataIndex: "email",
+      key: "email",
       width: "20%",
-      render: (_, record) => {
+      sorter: (a, b) => {
+        return a.email < b.email;
+      },
+      sortDirections: ["descend", "ascend"],
+      ...getColumnSearchProps("email"),
+    },
+    {
+      title: "Role",
+      dataIndex: "role",
+      key: "role",
+      width: "10%",
+      align: "center",
+      ...getColumnSearchProps("role"),
+      sorter: (a, b) => a.role < b.role,
+      sortDirections: ["descend", "ascend"],
+      render: (role) => {
+        let color = role === "61ec341698e78b1ec07d6219" ? "geekblue" : "green";
         return (
-          <a
-            rel="noreferrer"
-            href={`${clientURL}/exams/${record.key}`}
-            target={"_blank"}
-          >
-            View on website
-          </a>
+          <span>
+            <Tag color={color} key={role}>
+              {role === "61ec341698e78b1ec07d6219" ? "Admin" : "User"}
+            </Tag>
+          </span>
         );
       },
     },
     {
-      title: "Total of Questions",
-      dataIndex: "total_of_questions",
-      key: "topic",
-      width: "15%",
-      sorter: (a, b) => a.total_of_questions < b.total_of_questions,
-      sortDirections: ["descend", "ascend"],
-      ...getColumnSearchProps("total_of_questions"),
-    },
-    {
-      title: "Last Updated",
-      dataIndex: "updatedAt",
-      key: "updatedAt",
-      width: "10%",
-      align: "center",
-      ...getColumnSearchProps("updatedAt"),
-      sorter: (a, b) => new Date(a.updatedAt) < new Date(b.updatedAt),
-      sortDirections: ["descend", "ascend"],
-      render: (updateAt) => {
-        return <span>{new Date(updateAt).toLocaleString()}</span>;
-      },
-    },
-    {
       title: "Status",
-      dataIndex: "isPublic",
-      key: "isPublic",
+      dataIndex: "status",
+      key: "status",
       width: "10%",
       align: "center",
-      ...getColumnSearchProps("isPublic"),
-      sorter: (a, b) => a.isPublic < b.isPublic,
+      ...getColumnSearchProps("status"),
+      sorter: (a, b) => a.status < b.status,
       sortDirections: ["descend", "ascend"],
-      render: (isPublic) => {
-        let color = isPublic === "Public" ? "geekblue" : "green";
+      render: (status) => {
+        let color = status === "active" ? "geekblue" : "green";
         return (
           <span>
-            <Tag color={color} key={isPublic}>
-              {isPublic}
+            <Tag color={color} key={status}>
+              {status}
             </Tag>
           </span>
         );
@@ -202,14 +185,7 @@ export const TablesUser = ({ data, editExam, deleteExam }) => {
       render: (_, record) => {
         return (
           <Space size="middle">
-            <Button onClick={() => editExam(record._id)}>Edit</Button>
-            <Button
-              type="primary"
-              danger
-              onClick={() => deleteExam(record._id)}
-            >
-              Delete
-            </Button>
+            <Switch defaultChecked />
           </Space>
         );
       },

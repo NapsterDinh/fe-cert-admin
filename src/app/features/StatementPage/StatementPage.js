@@ -2,7 +2,7 @@ import { faHome, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Breadcrumb, Button } from "@themesberg/react-bootstrap";
 import { openNotificationWithIcon } from "app/base/components/Notification";
-import { deleteExam, getAllExam } from "app/core/apis/exam";
+import { getAllPurchase } from "app/core/apis/pricing";
 //data
 import { Routes } from "app/routes";
 import React, { useEffect, useState } from "react";
@@ -29,18 +29,18 @@ const StatementPage = () => {
   );
 
   const handleDeleteExam = async () => {
-    try {
-      const response = await deleteExam({
-        _id: currentQuestion,
-      });
-      if (response.status === 200) {
-        await fetchAllExam();
-        dispatch(toggleShowModal({ show: false }));
-        openNotificationWithIcon("success", "Delete service successfully");
-      }
-    } catch (error) {
-      alert(error);
-    }
+    // try {
+    //   const response = await deleteExam({
+    //     _id: currentQuestion,
+    //   });
+    //   if (response.status === 200) {
+    //     await fetchAllExam();
+    //     dispatch(toggleShowModal({ show: false }));
+    //     openNotificationWithIcon("success", "Delete service successfully");
+    //   }
+    // } catch (error) {
+    //   alert(error);
+    // }
   };
 
   const deleteUser = (id) => {
@@ -49,20 +49,29 @@ const StatementPage = () => {
   };
 
   const editQuestion = (id) => {
-    window.location = `/exam-management/${id}`;
+    // window.location = `/exam-management/${id}`;
   };
 
   const fetchAllExam = async () => {
     try {
-      const response = await getAllExam("exam");
+      const response = await getAllPurchase();
       if (response.status === 200) {
         setData(
-          response.data.exam.map((item) => ({
-            ...item,
-            id: item._id,
-            key: item._id,
-            total_of_questions: item?.questions?.length,
-          }))
+          response?.data?.userPricing
+            ?.sort(
+              (a, b) =>
+                new Date(b.createdAt).getTime() -
+                new Date(a.createdAt).getTime()
+            )
+            .map((item, index) => ({
+              ...item,
+              id: item?._id,
+              code: item?._id,
+              index: index,
+              service: item?.pricing?.name,
+              price: item?.price?.$numberDecimal,
+              duration: item?.pricing?.duration,
+            }))
         );
       }
     } catch (error) {}
@@ -84,7 +93,9 @@ const StatementPage = () => {
             <Breadcrumb.Item>
               <FontAwesomeIcon icon={faHome} />
             </Breadcrumb.Item>
-            <Breadcrumb.Item active>{Routes.StatementPage.name}</Breadcrumb.Item>
+            <Breadcrumb.Item active>
+              {Routes.StatementPage.name}
+            </Breadcrumb.Item>
           </Breadcrumb>
           <h4>{Routes.StatementPage.name}</h4>
           <p className="mb-0">

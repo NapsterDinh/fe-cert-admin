@@ -40,6 +40,12 @@ const HomePage = () => (
         path={Routes.ModulePage.path}
         component={Routes.ModulePage.element}
       />
+
+      <RouteWithSidebar
+        exact={Routes.NewModulePage.exact}
+        path={Routes.NewModulePage.path}
+        component={Routes.NewModulePage.element}
+      />
       <RouteWithSidebar
         exact={Routes.DetailModule.exact}
         path={Routes.DetailModule.path}

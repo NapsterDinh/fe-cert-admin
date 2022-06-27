@@ -1,16 +1,19 @@
+import { SearchOutlined } from "@ant-design/icons";
 import {
   Button,
+  Card,
   Col,
   Form,
   InputGroup,
   Modal,
 } from "@themesberg/react-bootstrap";
-import { Tabs } from "antd";
+import { Input, Space, Table, Tabs, Tag, Button as AntdButton } from "antd";
 import EditorToolbar, {
   formats,
   modules,
 } from "app/base/components/Editor/EditorToolbar";
 import { openNotificationWithIcon } from "app/base/components/Notification";
+import { getAllSection } from "app/core/apis/section";
 import {
   addNewTopic,
   editTopic,
@@ -19,11 +22,10 @@ import {
 } from "app/core/apis/topic";
 import { ErrorMessage, Field, Formik } from "formik";
 import React, { useEffect, useRef, useState } from "react";
+import Highlighter from "react-highlight-words";
 import ReactQuill from "react-quill";
 import * as Yup from "yup";
-import TranferSection from "./TransferSection/TransferSection";
 import "./ModalStyled.css";
-import { getAllSection } from "app/core/apis/section";
 
 const schema = Yup.object().shape({
   title: Yup.string().required("Title is required"),
@@ -51,8 +53,6 @@ export const ModalModule = ({
     status: "public",
     sections: [],
   });
-  const [allSection, setAllSection] = useState([]);
-  const [sectionOfToic, setSectionOfTopic] = useState([]);
   const handleAddNewTopic = async (values, setSubmitting, resetForm) => {
     if (currentTopic === "") {
       await addNewTopic({
@@ -71,7 +71,7 @@ export const ModalModule = ({
       openNotificationWithIcon("success", "Create a new topic successfully");
     } else {
       await editTopic({
-        _id: currentTopic,
+        _id: currentTopic?._id,
         title: values.title.trim(),
         description: window.btoa(
           unescape(encodeURIComponent(values.description))
@@ -81,7 +81,7 @@ export const ModalModule = ({
           .split("\n")
           .map((item) => item.trim())
           .filter((t) => t !== ""),
-        sections: sectionOfToic,
+        sections: currentTopic?.sections,
         status: values.status,
       });
       openNotificationWithIcon("success", "Edit topic successfully");
@@ -95,42 +95,13 @@ export const ModalModule = ({
     if (currentTopic !== "") {
       (async () => {
         try {
-          const response3 = await getAllSection();
-          const response = await getTopicById(currentTopic);
-          const response2 = await getTopicSectionByNonId();
-
-          if (response.status === 200) {
-            setData({
-              ...response?.data?.topic[0],
-              description: decodeURIComponent(
-                escape(window.atob(response?.data?.topic[0].description))
-              ),
-              objectives: response?.data?.topic[0].objective.join("\n"),
-            });
-            setAllSection(
-              response3?.data?.topicSection.map((item) => {
-                let result = response2?.data?.topicSection.some(
-                  (t) => item._id === t._id
-                );
-                if (result) {
-                  let result2 = response?.data?.topic[0]?.sections?.some(
-                    (u) => u._id === item._id
-                  );
-                  return {
-                    ...item,
-                    key: item._id,
-                    disabled: result2,
-                  };
-                }
-                return {
-                  ...item,
-                  key: item._id,
-                  disabled: false,
-                };
-              })
-            );
-            setSectionOfTopic(response?.data?.topic[0]?.sections);
-          }
+          setData({
+            ...currentTopic,
+            description: decodeURIComponent(
+              escape(window.atob(currentTopic.description))
+            ),
+            objectives: currentTopic.objective.join("\n"),
+          });
         } catch (error) {
           alert(error);
         }
@@ -217,20 +188,22 @@ export const ModalModule = ({
                             Note*: Use SubHeading if you want to make table of
                             content
                           </span>
-                          <Field name="description">
-                            {({ field }) => (
-                              <div className="text-editor">
-                                <EditorToolbar />
-                                <ReactQuill
-                                  theme="snow"
-                                  modules={modules}
-                                  formats={formats}
-                                  value={field.value}
-                                  onChange={field.onChange(field.name)}
-                                />
-                              </div>
-                            )}
-                          </Field>
+                          {currentTopic !== "" && (
+                            <Field name="description">
+                              {({ field }) => (
+                                <div className="text-editor">
+                                  <EditorToolbar />
+                                  <ReactQuill
+                                    theme="snow"
+                                    modules={modules}
+                                    formats={formats}
+                                    value={field.value}
+                                    onChange={field.onChange(field.name)}
+                                  />
+                                </div>
+                              )}
+                            </Field>
+                          )}
                           <ErrorMessage
                             name="description"
                             component="div"
@@ -318,11 +291,7 @@ export const ModalModule = ({
                       </TabPane>
                       {currentTopic !== "" && (
                         <TabPane tab="Section" key="2">
-                          <TranferSection
-                            data={allSection}
-                            sections={sectionOfToic}
-                            setSections={setSectionOfTopic}
-                          />
+                          <TableSectionTopic data={data?.sections} />
                         </TabPane>
                       )}
                     </Tabs>
@@ -388,5 +357,182 @@ export const ModalTutorial = ({ handleClose, show }) => {
         </Form>
       </Modal>
     </>
+  );
+};
+
+export const TableSectionTopic = ({ data, editSection, deleteSection }) => {
+  console.log(data);
+  const [searchText, setSearchText] = useState("");
+  const [searchedColumn, setSearchedColumn] = useState("");
+  const searchInput = useRef(null);
+
+  const handleSearch = (selectedKeys, confirm, dataIndex) => {
+    confirm();
+    setSearchText(selectedKeys[0]);
+    setSearchedColumn(dataIndex);
+  };
+
+  const handleReset = (clearFilters) => {
+    clearFilters();
+    setSearchText("");
+  };
+
+  const getColumnSearchProps = (dataIndex) => ({
+    filterDropdown: ({
+      setSelectedKeys,
+      selectedKeys,
+      confirm,
+      clearFilters,
+    }) => (
+      <div
+        style={{
+          padding: 8,
+        }}
+      >
+        <Input
+          ref={searchInput}
+          placeholder={`Search ${dataIndex}`}
+          value={selectedKeys[0]}
+          onChange={(e) =>
+            setSelectedKeys(e.target.value ? [e.target.value] : [])
+          }
+          onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
+          style={{
+            marginBottom: 8,
+            display: "block",
+          }}
+        />
+        <Space>
+          <Button
+            type="primary"
+            onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
+            icon={<SearchOutlined />}
+            size="small"
+            style={{
+              width: 90,
+            }}
+          >
+            Search
+          </Button>
+          <Button
+            onClick={() => clearFilters && handleReset(clearFilters)}
+            size="small"
+            style={{
+              width: 90,
+            }}
+          >
+            Reset
+          </Button>
+          <Button
+            type="link"
+            size="small"
+            onClick={() => {
+              confirm({
+                closeDropdown: false,
+              });
+              setSearchText(selectedKeys[0]);
+              setSearchedColumn(dataIndex);
+            }}
+          >
+            Filter
+          </Button>
+        </Space>
+      </div>
+    ),
+    filterIcon: (filtered) => (
+      <SearchOutlined
+        style={{
+          color: filtered ? "#1890ff" : undefined,
+        }}
+      />
+    ),
+    onFilter: (value, record) =>
+      record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()),
+    onFilterDropdownVisibleChange: (visible) => {
+      if (visible) {
+        setTimeout(() => searchInput.current?.select(), 100);
+      }
+    },
+    render: (text) =>
+      searchedColumn === dataIndex ? (
+        <Highlighter
+          highlightStyle={{
+            backgroundColor: "#ffc069",
+            padding: 0,
+          }}
+          searchWords={[searchText]}
+          autoEscape
+          textToHighlight={text ? text.toString() : ""}
+        />
+      ) : (
+        text
+      ),
+  });
+  const columns = [
+    {
+      title: "Title",
+      dataIndex: "title",
+      key: "title",
+      width: "20%",
+      sorter: (a, b) => {
+        return a.title.toLowerCase() < b.title.toLowerCase();
+      },
+
+      sortDirections: ["descend", "ascend"],
+      ...getColumnSearchProps("title"),
+    },
+    {
+      title: "Created At",
+      dataIndex: "createdAt",
+      key: "createdAt",
+      width: "10%",
+      align: "center",
+      ...getColumnSearchProps("createdAt"),
+      sorter: (a, b) => new Date(a.createdAt) < new Date(b.createdAt),
+      sortDirections: ["descend", "ascend"],
+      render: (createdAt) => {
+        return <span>{new Date(createdAt).toLocaleString()}</span>;
+      },
+    },
+    {
+      title: "Last Updated",
+      dataIndex: "updatedAt",
+      key: "updatedAt",
+      width: "10%",
+      align: "center",
+      ...getColumnSearchProps("updatedAt"),
+      sorter: (a, b) => new Date(a.updatedAt) < new Date(b.updatedAt),
+      sortDirections: ["descend", "ascend"],
+      render: (updateAt) => {
+        return <span>{new Date(updateAt).toLocaleString()}</span>;
+      },
+    },
+    {
+      title: "Status",
+      dataIndex: "status",
+      key: "status",
+      width: "5%",
+      align: "center",
+      ...getColumnSearchProps("status"),
+      sorter: (a, b) => a.status < b.status,
+      sortDirections: ["descend", "ascend"],
+      render: (status) => {
+        let color = status === "public" ? "geekblue" : "green";
+        return (
+          <span>
+            <Tag color={color} key={status}>
+              {status}
+            </Tag>
+          </span>
+        );
+      },
+    },
+  ];
+  return (
+    <Card border="light" className="table-wrapper table-responsive shadow-sm">
+      <Card.Body className="mt-3">
+        <Table columns={columns} dataSource={data} />
+      </Card.Body>
+    </Card>
   );
 };

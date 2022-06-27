@@ -10,8 +10,9 @@ import { trafficShares, totalOrders } from "../../data/charts";
 
 const DashboardPage = () => (
     <>
-      <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4">
-        <Dropdown className="btn-toolbar">
+      <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mt-4 mb-1">
+        <h3>Admin Dashboard</h3>
+        {/* <Dropdown className="btn-toolbar">
           <Dropdown.Toggle as={Button} variant="primary" size="sm" className="me-2">
             <FontAwesomeIcon icon={faPlus} className="me-2" />New Task
           </Dropdown.Toggle>
@@ -37,7 +38,7 @@ const DashboardPage = () => (
         <ButtonGroup>
           <Button variant="outline-primary" size="sm">Share</Button>
           <Button variant="outline-primary" size="sm">Export</Button>
-        </ButtonGroup>
+        </ButtonGroup> */}
       </div>
 
       <Row className="justify-content-md-center">

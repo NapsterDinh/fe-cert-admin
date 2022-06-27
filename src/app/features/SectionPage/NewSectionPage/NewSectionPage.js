@@ -14,22 +14,26 @@ import {
   InputGroup,
   Row,
 } from "@themesberg/react-bootstrap";
+import { Select } from "antd";
 import ModalConfirmDelete from "app/base/components/ModalConfirmDelete/ModalConfirmDelete";
 import { openNotificationWithIcon } from "app/base/components/Notification";
 import { deleteLesson } from "app/core/apis/lessons";
 import { editSection, getSectionById } from "app/core/apis/section";
+import { Routes } from "app/routes";
 // import { section } from "app/data/section";
 //data
-import { ErrorMessage, Field, Formik } from "formik";
-import { Routes } from "app/routes";
+import { ErrorMessage, Formik } from "formik";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory, useParams } from "react-router-dom";
 import { toggleShowModal, updateModalInfo } from "store/confirmDeleteReducer";
+import * as Yup from "yup";
 import ModalAddSection from "../ModalAddSection/ModalAddSection";
 import ModalLecture from "../ModalLecture/ModalLecture";
 import TableLectures from "../TableLectures/TableLectures";
-import * as Yup from "yup";
+import { getAllTopic } from "app/core/apis/topic";
+
+const { Option } = Select;
 
 const schema = Yup.object().shape({
   title: Yup.string().required("Title is required"),
@@ -37,6 +41,7 @@ const schema = Yup.object().shape({
     [`public`, `private`],
     "Selecting the status field is required"
   ),
+  topic: Yup.string().required("Topic is required"),
   lessons: Yup.array(),
 });
 
@@ -51,13 +56,14 @@ const NewSectionPage = () => {
   const handleShow = () => setShow(true);
   const [currentLecture, setCurrentLecture] = useState("");
   const modalConfirmDelete = useSelector((state) => state.confirmDelete);
-
+  const [topic, setTopic] = useState([]);
   const handleSaveSection = async (values) => {
     const section = {
       ...data,
       title: values.title,
       status: values.status,
       lessons: data?.lessons,
+      topic: values.topic,
     };
     try {
       const response = await editSection(section);
@@ -74,7 +80,10 @@ const NewSectionPage = () => {
     try {
       const response = await getSectionById(idSection);
       if (response.status === 200) {
-        setData(response?.data?.topicSection?.[0]);
+        setData({
+          ...response?.data?.topicSection?.[0],
+          topic: response?.data?.topicSection?.[0]?.topic?._id,
+        });
       }
     } catch (error) {
       alert(error);
@@ -82,7 +91,13 @@ const NewSectionPage = () => {
   };
 
   useEffect(() => {
-    (async () => await fetchSectionByID())();
+    (async () => {
+      try {
+        const response2 = await getAllTopic();
+        setTopic(response2?.data?.topic);
+        await fetchSectionByID();
+      } catch (error) {}
+    })();
   }, []);
 
   const handleCancelAddNewEdit = () => {
@@ -255,42 +270,76 @@ const NewSectionPage = () => {
                             />
                           </InputGroup>
                         </Form.Group>
+                        <Form.Group
+                          className={"form-group mb-3 d-flex"}
+                          as={Col}
+                          controlId="formTitle"
+                        >
+                          <div>
+                            <Form.Label>Status</Form.Label>
+                            <div key={`inline-radio-status`} className="mb-3">
+                              <Form.Check
+                                type={`radio`}
+                                inline
+                                label="Public"
+                                id={`inline-radio-3`}
+                                value="public"
+                                checked={values.status === "public"}
+                                onChange={() =>
+                                  setFieldValue("status", "public")
+                                }
+                                name="status"
+                              />
+                              <Form.Check
+                                type={`radio`}
+                                inline
+                                label="Private"
+                                id={`inline-radio-5`}
+                                value="private"
+                                checked={values.status === "private"}
+                                onChange={() =>
+                                  setFieldValue("status", "private")
+                                }
+                                name="status"
+                              />
+                            </div>
+                          </div>
+                        </Form.Group>
                       </Col>
-                      <Col lg={4} className="mx-5">
+                      <Col lg={4} className="">
                         <div
-                          style={{ marginTop: "2px" }}
                           className={
-                            errors.status && touched.status && "error mb-4"
+                            errors.topic && touched.topic && "error mb-4"
                           }
                         >
-                          <Form.Label>Status</Form.Label>
+                          <Form.Label style={{ marginRight: "20px" }}>
+                            Topic
+                          </Form.Label>
+                          <Select
+                            style={{ width: "300px" }}
+                            value={values.topic}
+                            onChange={(values) =>
+                              setFieldValue("topic", values)
+                            }
+                          >
+                            {topic?.map((t) => (
+                              <Option key={t._id} value={t._id}>
+                                {t.title}
+                              </Option>
+                            ))}
+                          </Select>
+                          <p
+                            style={{
+                              color: "red",
+                              marginTop: "20px",
+                              fontSize: "12.25px",
+                            }}
+                          >
+                            {errors.topic}
+                          </p>
 
-                          <div key={`inline-radio-status`} className="mb-3">
-                            <Form.Check
-                              type={`radio`}
-                              inline
-                              label="Public"
-                              id={`inline-radio-3`}
-                              value="public"
-                              checked={values.status === "public"}
-                              onChange={() => setFieldValue("status", "public")}
-                              name="status"
-                            />
-                            <Form.Check
-                              type={`radio`}
-                              inline
-                              label="Private"
-                              id={`inline-radio-5`}
-                              value="private"
-                              checked={values.status === "private"}
-                              onChange={() =>
-                                setFieldValue("status", "private")
-                              }
-                              name="status"
-                            />
-                          </div>
                           <ErrorMessage
-                            name="status"
+                            name="topic"
                             component="div"
                             className="invalid-feedback"
                           />
@@ -315,11 +364,17 @@ const NewSectionPage = () => {
                         </div>
 
                         <TableLectures
-                          data={data?.lessons?.map((item) => ({
-                            ...item,
-                            id: item._id,
-                            key: item._id,
-                          }))}
+                          data={data?.lessons
+                            ?.map((item) => ({
+                              ...item,
+                              id: item._id,
+                              key: item._id,
+                            }))
+                            ?.sort(
+                              (a, b) =>
+                                new Date(b.updatedAt).getTime() -
+                                new Date(a.updatedAt).getTime()
+                            )}
                           editLecture={editLecture}
                           deleteLecture={deleteLecture}
                         />

@@ -143,6 +143,31 @@ export const TableLectures = ({ data, editLecture, deleteLecture }) => {
       },
     },
     {
+      title: "Total Views",
+      dataIndex: "totalViews",
+      key: "totalViews",
+      width: "10%",
+      align: "center",
+      sorter: (a, b) => {
+        return a.totalViews < b.totalViews;
+      },
+      sortDirections: ["descend", "ascend"],
+      ...getColumnSearchProps("totalViews"),
+    },
+    {
+      title: "Created At",
+      dataIndex: "createdAt",
+      key: "createdAt",
+      width: "10%",
+      align: "center",
+      ...getColumnSearchProps("createdAt"),
+      sorter: (a, b) => new Date(a.createdAt) < new Date(b.createdAt),
+      sortDirections: ["descend", "ascend"],
+      render: (createdAt) => {
+        return <span>{new Date(createdAt).toLocaleString()}</span>;
+      },
+    },
+    {
       title: "Last Updated",
       dataIndex: "updatedAt",
       key: "updatedAt",

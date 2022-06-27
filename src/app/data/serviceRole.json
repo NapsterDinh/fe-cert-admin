@@ -1,0 +1,48 @@
+[
+    {
+      "name": "Do real FE Exams",
+      "description": "Allow practice with real FE exams",
+      "isDefault": true,
+      "isDeleted":false
+    },
+    {
+      "name": "Practice with many topics",
+      "description": "Allow practice with many questions of many different topics",
+      "isDefault": true,
+      "isDeleted":false
+    },
+    {
+      "name": "Show statistic of studying process",
+      "description": "Allows users to view statistics of the learning process",
+      "isDefault": true,
+      "isDeleted":false
+    },
+    {
+      "name": "Show right answer",
+      "description":
+        "When user access to show result page, user can see right answer which highlighted by green color",
+      "isDefault": false,
+      "isDeleted":false
+    },
+    {
+      "name": "Show explanation",
+      "description":
+        "When user access to show result page, user can see exaplanation of this question",
+      "isDefault": false,
+      "isDeleted":false
+    },
+    {
+      "name": "Show statistic of results of each test attemp",
+      "description":
+        "When user access to show result page, the tab named Statistic of result will be appeard and user can see it",
+      "isDefault": false,
+      "isDeleted":false
+    },
+    {
+      "name": "See next result prediction",
+      "description":
+        "When user access to whatever exam detailed page, See next result prediction button will be appeard and user can click on this to show result of prediction",
+      "isDefault": false,
+      "isDeleted":false
+    }
+  ]

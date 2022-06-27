@@ -7,7 +7,6 @@ import Highlighter from "react-highlight-words";
 import "./TableSection.css";
 
 export const TableSection = ({ data, editSection, deleteSection }) => {
-  console.log(data);
   const [searchText, setSearchText] = useState("");
   const [searchedColumn, setSearchedColumn] = useState("");
   const searchInput = useRef(null);
@@ -121,16 +120,33 @@ export const TableSection = ({ data, editSection, deleteSection }) => {
       key: "title",
       width: "20%",
       sorter: (a, b) => {
-        console.log(
-          a.title.toLowerCase(),
-          b.title.toLowerCase(),
-          a.title.toLowerCase() < b.title.toLowerCase()
-        );
         return a.title.toLowerCase() < b.title.toLowerCase();
       },
 
       sortDirections: ["descend", "ascend"],
       ...getColumnSearchProps("title"),
+    },
+    {
+      title: "Topic",
+      dataIndex: "topic",
+      key: "topic",
+      width: "20%",
+      sorter: (a, b) => {
+        return a?.topic?.title?.toLowerCase() < b?.topic?.title?.toLowerCase();
+      },
+      sortDirections: ["descend", "ascend"],
+      // ...getColumnSearchProps("topic"),
+      filters: data
+        ?.map((item, index) => ({
+          key: `topicTitle${index}`,
+          text: item?.topic === undefined ? "Empty" : item?.topic,
+          value: item?.topic === undefined ? "Empty" : item?.topic,
+        }))
+        .filter(
+          (value, index, self) =>
+            self.findIndex((item) => item.value === value.value) === index
+        ),
+      onFilter: (value, record) => record?.topic?.indexOf(value) === 0,
     },
     {
       title: "Total of Lessons",
@@ -143,6 +159,19 @@ export const TableSection = ({ data, editSection, deleteSection }) => {
       },
       sortDirections: ["descend", "ascend"],
       ...getColumnSearchProps("total_of_lessons"),
+    },
+    {
+      title: "Created At",
+      dataIndex: "createdAt",
+      key: "createdAt",
+      width: "10%",
+      align: "center",
+      ...getColumnSearchProps("createdAt"),
+      sorter: (a, b) => new Date(a.createdAt) < new Date(b.createdAt),
+      sortDirections: ["descend", "ascend"],
+      render: (createdAt) => {
+        return <span>{new Date(createdAt).toLocaleString()}</span>;
+      },
     },
     {
       title: "Last Updated",

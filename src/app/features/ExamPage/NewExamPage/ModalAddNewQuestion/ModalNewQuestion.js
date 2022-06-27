@@ -1,27 +1,22 @@
 import {
   Button,
   Col,
-  Form,
-  InputGroup,
-  Modal,
-  Row,
+  Form, Modal,
+  Row
 } from "@themesberg/react-bootstrap";
+import { Select } from "antd";
 import EditorToolbar, {
   formats,
-  modules,
+  modules
 } from "app/base/components/Editor/EditorToolbar";
-import ReactQuill from "react-quill";
-import { Select, message } from "antd";
 import { openNotificationWithIcon } from "app/base/components/Notification";
-import { getAllSection } from "app/core/apis/section";
-import { getAllLesson } from "app/core/apis/lessons";
 import {
   addNewQuestionWithExam,
-  editQuestion,
-  getQuestionById as getQuestionByIDQuestion,
+  editQuestion
 } from "app/core/apis/question";
-import { getAllTopic } from "app/core/apis/topic";
+import { getAllSection } from "app/core/apis/section";
 import React, { useEffect, useState } from "react";
+import ReactQuill from "react-quill";
 import "./ModalNewQuestion.css";
 
 const { Option } = Select;

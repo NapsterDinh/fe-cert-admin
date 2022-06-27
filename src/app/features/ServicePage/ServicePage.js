@@ -3,24 +3,29 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Breadcrumb, Button } from "@themesberg/react-bootstrap";
 import ModalConfirmDelete from "app/base/components/ModalConfirmDelete/ModalConfirmDelete";
 import { openNotificationWithIcon } from "app/base/components/Notification";
-import { deleteExam, getAllExam } from "app/core/apis/exam";
+import {
+  deletePricing,
+  getAllPricing,
+  getAllAbilityPricing,
+} from "app/core/apis/pricing";
 //data
 import { Routes } from "app/routes";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toggleShowModal, updateModalInfo } from "store/confirmDeleteReducer";
-import ModalAddNewExamAdmin from "./ModalAddNewService/ModalAddNewService";
+import ModalAddNewService from "./ModalAddNewService/ModalAddNewService";
 import TablesService from "./TablesService/TablesService";
 
 const ServicePage = () => {
   const [data, setData] = useState([]);
   const [show, setShow] = useState(false);
+  const [abilitiesService, setAbilitiesService] = useState([]);
 
   const modalConfirmDelete = useSelector((state) => state.confirmDelete);
   const dispatch = useDispatch();
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
-  const [currentQuestion, setCurrentQuestion] = useState("");
+  const [currentService, setcurrentService] = useState("");
 
   dispatch(
     updateModalInfo({
@@ -32,8 +37,8 @@ const ServicePage = () => {
 
   const handleDeleteExam = async () => {
     try {
-      const response = await deleteExam({
-        _id: currentQuestion,
+      const response = await deletePricing({
+        _id: currentService,
       });
       if (response.status === 200) {
         await fetchAllExam();
@@ -45,25 +50,33 @@ const ServicePage = () => {
     }
   };
 
-  const deleteUser = (id) => {
-    setCurrentQuestion(id);
+  const deleteUser = (item) => {
+    setcurrentService(item);
     dispatch(toggleShowModal({ show: true }));
   };
 
-  const editQuestion = (id) => {
-    window.location = `/exam-management/${id}`;
+  const editQuestion = (item) => {
+    setcurrentService(item);
+    handleShow();
   };
 
   const fetchAllExam = async () => {
     try {
-      const response = await getAllExam("exam");
+      const response = await getAllPricing();
       if (response.status === 200) {
         setData(
-          response.data.exam.map((item) => ({
-            ...item,
-            id: item._id,
-            key: item._id,
-            total_of_questions: item?.questions?.length,
+          Object.entries(response?.data?.pricing).map((item) => ({
+            ...item[1],
+            id: item[1]._id,
+            key: item[1]._id,
+            price:
+              item[1]?.price?.$numberDecimal === undefined
+                ? 0
+                : item[1]?.price?.$numberDecimal,
+            revenue:
+              item[1]?.revenue?.$numberDecimal === undefined
+                ? 0
+                : item[1]?.revenue?.$numberDecimal,
           }))
         );
       }
@@ -72,6 +85,16 @@ const ServicePage = () => {
   useEffect(() => {
     (async () => {
       await fetchAllExam();
+      const response = await getAllAbilityPricing();
+      try {
+        if (response.status === 200) {
+          setAbilitiesService(response?.data?.ability);
+        } else {
+          console.log(response?.data?.msg);
+        }
+      } catch (error) {
+        console.log(error);
+      }
     })();
   }, []);
 
@@ -82,10 +105,19 @@ const ServicePage = () => {
         handleClose={() => dispatch(toggleShowModal({ show: false }))}
         {...modalConfirmDelete}
       />
-      <ModalAddNewExamAdmin
+      <ModalAddNewService
         show={show}
-        handleClose={handleClose}
+        handleClose={() => {
+          setcurrentService("");
+          handleClose();
+        }}
         fetchAllExam={fetchAllExam}
+        currentService={currentService}
+        abilitiesService={abilitiesService?.map((t) => ({
+          ...t,
+          label: t.name,
+          value: t._id,
+        }))}
       />
       <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4">
         <div className="d-block mb-4 mb-md-0">

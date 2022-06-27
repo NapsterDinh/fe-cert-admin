@@ -11,21 +11,25 @@ import { addNewSection } from "app/core/apis/section";
 import { ErrorMessage, Formik } from "formik";
 import React from "react";
 import * as Yup from "yup";
+import { Select } from "antd";
 import "./ModalAddNewSection.css";
 
+const { Option } = Select;
 const schema = Yup.object().shape({
   title: Yup.string().required("Title is required"),
   status: Yup.string().oneOf(
     [`public`, `private`],
     "Selecting the status field is required"
   ),
+  topic: Yup.string().required("Topic is required"),
 });
 
-const ModalAddNewSection = ({ show, handleClose, getAllSection }) => {
+const ModalAddNewSection = ({ show, handleClose, getAllSection, topic }) => {
   const handleSaveSection = async (values, setSubmitting, resetForm) => {
     const section = {
       title: values.title.trim(),
-      status: values.status,
+      status: "public",
+      topic: values.topic,
     };
 
     try {
@@ -60,6 +64,7 @@ const ModalAddNewSection = ({ show, handleClose, getAllSection }) => {
           initialValues={{
             title: "",
             status: "public",
+            topic: "",
           }}
           validationSchema={schema}
           onSubmit={(values, { setSubmitting, resetForm }) =>
@@ -113,36 +118,34 @@ const ModalAddNewSection = ({ show, handleClose, getAllSection }) => {
                         className="invalid-feedback"
                       />
                     </Form.Group>
+                    <Form.Label style={{ marginRight: "20px" }}>
+                      Topic
+                    </Form.Label>
                     <Form.Group
-                      className={"form-group mb-3 d-flex"}
+                      className={"form-group mb-3"}
                       as={Col}
                       controlId="formTitle"
                     >
-                      <div>
-                        <Form.Label>Status</Form.Label>
-                        <div key={`inline-radio-status`} className="mb-3">
-                          <Form.Check
-                            type={`radio`}
-                            inline
-                            label="Public"
-                            id={`inline-radio-3`}
-                            value="public"
-                            checked={values.status === "public"}
-                            onChange={() => setFieldValue("status", "public")}
-                            name="status"
-                          />
-                          <Form.Check
-                            type={`radio`}
-                            inline
-                            label="Private"
-                            id={`inline-radio-5`}
-                            value="private"
-                            checked={values.status === "private"}
-                            onChange={() => setFieldValue("status", "private")}
-                            name="status"
-                          />
-                        </div>
-                      </div>
+                      <Select
+                        style={{ width: "300px" }}
+                        value={values.topic}
+                        onChange={(values) => setFieldValue("topic", values)}
+                      >
+                        {topic?.map((t) => (
+                          <Option key={t._id} value={t._id}>
+                            {t.title}
+                          </Option>
+                        ))}
+                      </Select>
+                      <p
+                        style={{
+                          color: "red",
+                          marginTop: "20px",
+                          fontSize: "12.25px",
+                        }}
+                      >
+                        {errors.topic}
+                      </p>
                     </Form.Group>
                   </Row>
                 </Modal.Body>

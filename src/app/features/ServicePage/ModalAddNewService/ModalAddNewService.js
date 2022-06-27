@@ -1,47 +1,100 @@
 import {
-  Button, Card, Col,
+  Button,
+  Card,
+  Col,
   Form,
   InputGroup,
   Modal,
-  Row
+  Row,
 } from "@themesberg/react-bootstrap";
-import { openNotificationWithIcon } from "app/base/components/Notification";
-import { addNewExam } from "app/core/apis/exam";
+import { Tooltip, Checkbox } from "antd";
 import { ErrorMessage, Formik } from "formik";
 import React from "react";
 import * as Yup from "yup";
+import { addNewPricing, editPricing } from "app/core/apis/pricing";
+import { openNotificationWithIcon } from "app/base/components/Notification";
+
 import "./ModalAddNewService.css";
 
 const schema = Yup.object().shape({
-  title: Yup.string().required("Title is required"),
+  name: Yup.string().required("Name is required"),
   description: Yup.string().required("Description is required"),
-  price: Yup.string().required("Price is required"),
+  price: Yup.number()
+    .required("Price is required")
+    .min(1, "Price is more than 1 dollar")
+    .test(
+      "Is positive?",
+      "ERROR: The price must be greater than 0!",
+      (value) => value > 0
+    ),
+  duration: Yup.number()
+    .required("Duration is required")
+    .min(1, "Duration is more than 1 day")
+    .integer("Please provide integer")
+    .test(
+      "Is positive?",
+      "ERROR: The price must be greater than 0!",
+      (value) => value > 0
+    ),
+  abilities: Yup.array().min(1, "Abilities is required"),
   status: Yup.string().oneOf(
-    [`public`, `private`],
+    [`public`, `private`, "coming_soon"],
     "Selecting the status field is required"
   ),
 });
 
 const initialValues = {
-  title: "",
+  name: "",
   description: "",
-  content: "",
+  price: 0,
+  isBestValue: false,
+  duration: 30,
+  abilities: [],
   status: "private",
 };
 
-const ModalAddNewService = ({ show, handleClose, fetchAllExam }) => {
+const ModalAddNewService = ({
+  show,
+  handleClose,
+  fetchAllExam,
+  currentService,
+  abilitiesService,
+}) => {
+  console.log(currentService);
   const onHandleSubmit = async (values, setSubmitting, resetForm) => {
     try {
-      const response = await addNewExam({
-        type: values.type,
-        title: values.title,
-        content: window.btoa(unescape(encodeURIComponent(values.content))),
-        isPublic: "Private",
-      });
-      if (response.status === 201) {
+      let response = "";
+      if (currentService === "") {
+        response = await addNewPricing({
+          name: values.name,
+          description: values.description,
+          price: values.price,
+          duration: values.duration,
+          isBestValue: values.isBestValue,
+          abilities: values.abilities,
+          status: "private",
+        });
+      } else {
+        response = await editPricing({
+          _id: currentService?._id,
+          name: values.name,
+          description: values.description,
+          price: values.price,
+          duration: values.duration,
+          isBestValue: values.isBestValue,
+          abilities: values.abilities,
+          status: values.status,
+        });
+      }
+
+      if (response.status === 200) {
         await fetchAllExam();
         handleClose();
-        openNotificationWithIcon("success", "Create exam successfully");
+        if (currentService === "") {
+          openNotificationWithIcon("success", "Create service successfully");
+        } else {
+          openNotificationWithIcon("success", "Update service successfully");
+        }
       }
     } catch (error) {
     } finally {
@@ -60,7 +113,21 @@ const ModalAddNewService = ({ show, handleClose, fetchAllExam }) => {
       >
         <Formik
           enableReinitialize
-          initialValues={initialValues}
+          initialValues={
+            currentService === ""
+              ? {
+                  ...initialValues,
+                  abilities: abilitiesService
+                    ?.filter((t) => t.isDefault)
+                    ?.map((item) => item?._id),
+                }
+              : {
+                  ...currentService,
+                  abilities: currentService?.abilities?.map(
+                    (item) => item?._id
+                  ),
+                }
+          }
           validationSchema={schema}
           onSubmit={(values, { setSubmitting, resetForm }) =>
             onHandleSubmit(values, setSubmitting, resetForm)
@@ -85,73 +152,42 @@ const ModalAddNewService = ({ show, handleClose, fetchAllExam }) => {
                 <Modal.Body>
                   <Row>
                     <Col className="col-left">
-                      {/* <Form.Group
-                        className={errors.type && touched.type && "error mb-4"}
-                        controlId="tutorialTitle"
-                      >
-                        <Form.Label>Type</Form.Label>
-                        <div>
-                          <Select
-                            style={{ width: "100%" }}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                            name="type"
-                            value={values.type}
-                          >
-                            <Option key={"exam-type"} value={"exam"}>
-                              Exam
-                            </Option>
-                            <Option key={"exam-type"} value={"custem_exam"}>
-                              Custom Exam
-                            </Option>
-                          </Select>
-                        </div>
-                      </Form.Group> */}
                       <Form.Group
-                        className={
-                          errors.title && touched.title && "error mb-4"
-                        }
-                        controlId="tutorialTitle"
+                        className={errors.name && touched.name && "error"}
+                        controlId="tutorialname"
                       >
-                        <Form.Label>Title</Form.Label>
-                        <ErrorMessage
-                          name="title"
-                          component="div"
-                          className="invalid-feedback"
-                        />
+                        <Form.Label>Name</Form.Label>
                         <InputGroup
                           className={
-                            errors.title && touched.title && "error mb-3"
+                            errors.name && touched.name && "error mb-3"
                           }
                         >
                           <Form.Control
                             autoFocus
-                            value={values.title}
+                            value={values.name}
                             onChange={(e) => {
                               handleChange(e);
                             }}
                             onBlur={handleBlur}
-                            className={errors.title && touched.title && "error"}
-                            name="title"
+                            className={errors.name && touched.name && "error"}
+                            name="name"
                             type="text"
-                            placeholder="Enter title"
+                            placeholder="Enter name"
                           />
                         </InputGroup>
+                        <ErrorMessage
+                          name="name"
+                          component="div"
+                          className="invalid-feedback"
+                        />
                       </Form.Group>
                       <Form.Group
                         className={
-                          errors.description &&
-                          touched.description &&
-                          "error mb-4"
+                          errors.description && touched.description && "error"
                         }
                         controlId="tutorialTitle"
                       >
                         <Form.Label>Description</Form.Label>
-                        <ErrorMessage
-                          name="description"
-                          component="div"
-                          className="invalid-feedback"
-                        />
                         <InputGroup
                           className={
                             errors.description &&
@@ -175,80 +211,217 @@ const ModalAddNewService = ({ show, handleClose, fetchAllExam }) => {
                             placeholder="Enter description"
                           />
                         </InputGroup>
-                      </Form.Group>
-                      <Form.Group
-                        className={
-                          errors.price && touched.price && "error mb-4"
-                        }
-                        controlId="tutorialTitle"
-                      >
-                        <Form.Label>Price</Form.Label>
                         <ErrorMessage
-                          name="price"
+                          name="description"
                           component="div"
                           className="invalid-feedback"
                         />
-                        <InputGroup
+                      </Form.Group>
+                      <div className="d-flex">
+                        <Form.Group
                           className={
-                            errors.price && touched.price && "error mb-3"
+                            errors.duration && touched.duration && "error mb-4"
                           }
+                          controlId="tutorialTitle"
                         >
-                          <Form.Control
-                            autoFocus
-                            value={values.price}
-                            onChange={(e) => {
-                              handleChange(e);
-                            }}
-                            onBlur={handleBlur}
-                            className={errors.price && touched.price && "error"}
-                            name="price"
-                            type="number"
-                            placeholder="Enter price"
+                          <Form.Label>Duration(days)</Form.Label>
+                          <InputGroup
+                            className={
+                              errors.duration &&
+                              touched.duration &&
+                              "error mb-3"
+                            }
+                          >
+                            <Form.Control
+                              autoFocus
+                              value={values.duration}
+                              onChange={(e) => {
+                                handleChange(e);
+                              }}
+                              onBlur={handleBlur}
+                              className={
+                                errors.duration && touched.duration && "error"
+                              }
+                              name="duration"
+                              type="number"
+                              placeholder="Enter duration"
+                            />
+                          </InputGroup>
+                          <ErrorMessage
+                            name="duration"
+                            component="div"
+                            className="invalid-feedback"
                           />
-                        </InputGroup>
+                        </Form.Group>
+                        <Form.Group
+                          style={{ marginLeft: "40px" }}
+                          className={
+                            errors.price && touched.price && "error mb-4"
+                          }
+                          controlId="tutorialTitle"
+                        >
+                          <Form.Label>Price ($)</Form.Label>
+                          <InputGroup
+                            className={
+                              errors.price && touched.price && "error mb-3"
+                            }
+                          >
+                            <Form.Control
+                              autoFocus
+                              value={values.price}
+                              onChange={(e) => {
+                                handleChange(e);
+                              }}
+                              onBlur={handleBlur}
+                              className={
+                                errors.price && touched.price && "error"
+                              }
+                              name="price"
+                              type="number"
+                              placeholder="Enter price"
+                            />
+                          </InputGroup>
+                          <ErrorMessage
+                            name="price"
+                            component="div"
+                            className="invalid-feedback"
+                          />
+                        </Form.Group>
+                      </div>
+                      {/* 
+                      <Form.Group
+                        className={`
+                        mt-3
+                          ${
+                            errors.isBestValue &&
+                            touched.isBestValue &&
+                            "error mb-4"
+                          }
+                        `}
+                        controlId="deactivated"
+                      >
+                        <ErrorMessage
+                          name="isBestValue"
+                          component="div"
+                          className="invalid-feedback"
+                        />
+                        <div>
+                          <Tooltip
+                            title={
+                              "Label Best Value will be displayed with this service"
+                            }
+                          >
+                            <Checkbox
+                              key={`collapseBestValue`}
+                              value="Morning"
+                              checked={values.isBestValue}
+                              onChange={(e) => {
+                                setFieldValue("isBestValue", e.target.checked);
+                              }}
+                              name="isBestValue"
+                            >
+                              Is Best Value
+                            </Checkbox>
+                          </Tooltip>
+                        </div>
+                      </Form.Group> */}
+
+                      <Form.Group
+                        className={
+                          errors.abilities && touched.abilities && "error mb-4"
+                        }
+                        controlId="deactivated"
+                      >
+                        <Form.Label>Abilities</Form.Label>
+                        <ErrorMessage
+                          name="abilities"
+                          component="div"
+                          className="invalid-feedback"
+                        />
+                        <div>
+                          <Checkbox.Group
+                            defaultValue={values?.abilities}
+                            onChange={(checkedValues) => {
+                              console.log(checkedValues);
+                              setFieldValue("abilities", checkedValues);
+                            }}
+                            className="d-flex flex-wrap"
+                          >
+                            {abilitiesService?.map((item1, index1) => (
+                              <Col lg={3} className="mb-2">
+                                <Tooltip title={item1?.description}>
+                                  <Checkbox
+                                    disabled={item1.isDefault}
+                                    key={`collapse${item1?._id}${index1}`}
+                                    value={item1._id}
+                                  >
+                                    {item1?.name}
+                                  </Checkbox>
+                                </Tooltip>
+                              </Col>
+                            ))}
+                          </Checkbox.Group>
+                        </div>
                       </Form.Group>
                     </Col>
-                    <Col lg={3}>
-                      <Card className="mt-4">
-                        <Card.Body>
-                          <Form.Group
-                            className={"form-group mb-3 d-flex"}
-                            as={Col}
-                            controlId="formTitle"
-                          >
-                            <div>
-                              <Form.Label>Status</Form.Label>
-                              <div key={`inline-radio-status`} className="mb-3">
-                                <Form.Check
-                                  type={`radio`}
-                                  inline
-                                  label="Public"
-                                  id={`inline-radio-3`}
-                                  value="public"
-                                  checked={values.status === "public"}
-                                  onChange={() =>
-                                    setFieldValue("status", "public")
-                                  }
-                                  name="status"
-                                />
-                                <Form.Check
-                                  type={`radio`}
-                                  inline
-                                  label="Private"
-                                  id={`inline-radio-5`}
-                                  value="private"
-                                  checked={values.status === "private"}
-                                  onChange={() =>
-                                    setFieldValue("status", "private")
-                                  }
-                                  name="status"
-                                />
+                    {currentService !== "" && (
+                      <Col lg={3}>
+                        <Card className="mt-4">
+                          <Card.Body>
+                            <Form.Group
+                              className={"form-group mb-3 d-flex"}
+                              as={Col}
+                              controlId="formTitle"
+                            >
+                              <div>
+                                <Form.Label>Status</Form.Label>
+                                <div
+                                  key={`inline-radio-status`}
+                                  className="mb-3"
+                                >
+                                  <Form.Check
+                                    type={`radio`}
+                                    inline
+                                    label="Public"
+                                    id={`inline-radio-3`}
+                                    value="public"
+                                    checked={values.status === "public"}
+                                    onChange={() =>
+                                      setFieldValue("status", "public")
+                                    }
+                                    name="status"
+                                  />
+                                  <Form.Check
+                                    type={`radio`}
+                                    inline
+                                    label="Private"
+                                    id={`inline-radio-5`}
+                                    value="private"
+                                    checked={values.status === "private"}
+                                    onChange={() =>
+                                      setFieldValue("status", "private")
+                                    }
+                                    name="status"
+                                  />
+                                  <Form.Check
+                                    type={`radio`}
+                                    inline
+                                    label="Comming Soon"
+                                    id={`inline-radio-4`}
+                                    value="coming_soon"
+                                    checked={values.status === "coming_soon"}
+                                    onChange={() =>
+                                      setFieldValue("status", "coming_soon")
+                                    }
+                                    name="status"
+                                  />
+                                </div>
                               </div>
-                            </div>
-                          </Form.Group>
-                        </Card.Body>
-                      </Card>
-                    </Col>
+                            </Form.Group>
+                          </Card.Body>
+                        </Card>
+                      </Col>
+                    )}
                   </Row>
                 </Modal.Body>
                 <Modal.Footer>

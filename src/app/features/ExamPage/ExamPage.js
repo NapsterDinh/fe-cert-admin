@@ -10,12 +10,13 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toggleShowModal, updateModalInfo } from "store/confirmDeleteReducer";
 import ModalAddNewExamAdmin from "./ModalAddNewExamAdmin/ModalAddNewExamAdmin";
+import ModalViewDetailExam from "./ModalViewDetailExam/ModalViewDetailExam";
 import TablesExam from "./TablesExam/TablesExam";
 
 const ExamPage = () => {
   const [data, setData] = useState([]);
   const [show, setShow] = useState(false);
-
+  const [showDetail, setShowDetail] = useState(false);
   const modalConfirmDelete = useSelector((state) => state.confirmDelete);
   const dispatch = useDispatch();
   const handleClose = () => setShow(false);
@@ -59,12 +60,18 @@ const ExamPage = () => {
       const response = await getAllExam("exam");
       if (response.status === 200) {
         setData(
-          response.data.exam.map((item) => ({
-            ...item,
-            id: item._id,
-            key: item._id,
-            total_of_questions: item?.questions?.length,
-          }))
+          response.data.exam
+            .map((item) => ({
+              ...item,
+              id: item._id,
+              key: item._id,
+              total_of_questions: item?.questions?.length,
+            }))
+            ?.sort(
+              (a, b) =>
+                new Date(b.createdAt).getTime() -
+                new Date(a.createdAt).getTime()
+            )
         );
       }
     } catch (error) {}
@@ -77,6 +84,14 @@ const ExamPage = () => {
 
   return (
     <>
+      <ModalViewDetailExam
+        show={showDetail}
+        handleClose={() => {
+          setCurrentQuestion("");
+          setShowDetail(false);
+        }}
+        item={currentQuestion}
+      />
       <ModalConfirmDelete
         handleSubmit={handleDeleteExam}
         handleClose={() => dispatch(toggleShowModal({ show: false }))}
@@ -117,6 +132,10 @@ const ExamPage = () => {
           deleteExam={deleteUser}
           editExam={editQuestion}
           data={data}
+          showDetail={(item) => {
+            setCurrentQuestion(item);
+            setShowDetail(true);
+          }}
           handleShow={handleShow}
         />
       </div>

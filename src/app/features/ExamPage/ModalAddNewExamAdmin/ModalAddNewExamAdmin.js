@@ -47,6 +47,9 @@ const ModalAddNewExamAdmin = ({ show, handleClose, fetchAllExam }) => {
       const response = await addNewExam({
         type: values.type,
         title: values.title,
+        time: 9000,
+        totalQuestions: 80,
+        isSessionMorning: true,
         content: window.btoa(unescape(encodeURIComponent(values.content))),
         isPublic: 'Private',
       });

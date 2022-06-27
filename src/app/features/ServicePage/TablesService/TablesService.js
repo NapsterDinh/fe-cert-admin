@@ -7,6 +7,7 @@ import { clientURL } from "configuration";
 import "./TablesService.css";
 
 export const TablesService = ({ data, editExam, deleteExam }) => {
+  console.log(data);
   const [searchText, setSearchText] = useState("");
   const [searchedColumn, setSearchedColumn] = useState("");
   const searchInput = useRef(null);
@@ -114,52 +115,52 @@ export const TablesService = ({ data, editExam, deleteExam }) => {
       ),
   });
   const columns = [
-    // {
-    //   title: "Type",
-    //   dataIndex: "type",
-    //   key: "type",
-    //   width: "5%",
-    //   align: "center",
-    //   ...getColumnSearchProps("type"),
-    //   sorter: (a, b) => a.type < b.type,
-    //   sortDirections: ["descend", "ascend"],
-    // },
     {
-      title: "Title",
-      dataIndex: "title",
-      key: "title",
+      title: "Name",
+      dataIndex: "name",
+      key: "name",
       width: "20%",
       sorter: (a, b) => {
-        return a.title < b.title;
+        return a.name < b.name;
       },
       sortDirections: ["descend", "ascend"],
-      ...getColumnSearchProps("title"),
+      ...getColumnSearchProps("name"),
     },
     {
-      title: "Slug",
-      dataIndex: "slug",
-      key: "slug",
-      width: "20%",
-      render: (_, record) => {
-        return (
-          <a
-            rel="noreferrer"
-            href={`${clientURL}/exams/${record.key}`}
-            target={"_blank"}
-          >
-            View on website
-          </a>
-        );
+      title: "Number of Payment",
+      dataIndex: "numberOfPayment",
+      key: "numberOfPayment",
+      width: "10%",
+      align: "center",
+      sorter: (a, b) => {
+        return a.numberOfPayment < b.numberOfPayment;
       },
+      sortDirections: ["descend", "ascend"],
+      ...getColumnSearchProps("numberOfPayment"),
     },
     {
-      title: "Total of Questions",
-      dataIndex: "total_of_questions",
-      key: "topic",
-      width: "15%",
-      sorter: (a, b) => a.total_of_questions < b.total_of_questions,
+      title: "Revenue($)",
+      dataIndex: "revenue",
+      key: "revenue",
+      align: "center",
+      width: "10%",
+      sorter: (a, b) => {
+        return a.revenue < b.revenue;
+      },
       sortDirections: ["descend", "ascend"],
-      ...getColumnSearchProps("total_of_questions"),
+      ...getColumnSearchProps("revenue"),
+    },
+    {
+      title: "Number of User",
+      dataIndex: "numberOfUser",
+      key: "numberOfUser",
+      align: "center",
+      width: "10%",
+      sorter: (a, b) => {
+        return a.numberOfUser < b.numberOfUser;
+      },
+      sortDirections: ["descend", "ascend"],
+      ...getColumnSearchProps("numberOfUser"),
     },
     {
       title: "Last Updated",
@@ -176,19 +177,24 @@ export const TablesService = ({ data, editExam, deleteExam }) => {
     },
     {
       title: "Status",
-      dataIndex: "isPublic",
-      key: "isPublic",
+      dataIndex: "status",
+      key: "status",
       width: "10%",
       align: "center",
-      ...getColumnSearchProps("isPublic"),
-      sorter: (a, b) => a.isPublic < b.isPublic,
+      ...getColumnSearchProps("status"),
+      sorter: (a, b) => a.status < b.status,
       sortDirections: ["descend", "ascend"],
-      render: (isPublic) => {
-        let color = isPublic === "Public" ? "geekblue" : "green";
+      render: (status) => {
+        let color =
+          status === "public"
+            ? "geekblue"
+            : status === "private"
+            ? "green"
+            : "red";
         return (
           <span>
-            <Tag color={color} key={isPublic}>
-              {isPublic}
+            <Tag color={color} key={status}>
+              {status}
             </Tag>
           </span>
         );
@@ -202,12 +208,8 @@ export const TablesService = ({ data, editExam, deleteExam }) => {
       render: (_, record) => {
         return (
           <Space size="middle">
-            <Button onClick={() => editExam(record._id)}>Edit</Button>
-            <Button
-              type="primary"
-              danger
-              onClick={() => deleteExam(record._id)}
-            >
+            <Button onClick={() => editExam(record)}>Edit</Button>
+            <Button type="primary" danger onClick={() => deleteExam(record)}>
               Delete
             </Button>
           </Space>
