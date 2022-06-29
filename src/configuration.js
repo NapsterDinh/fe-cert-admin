@@ -1,5 +1,6 @@
 const configuration = {
-  ApiUrl: "http://ec2-18-118-107-150.us-east-2.compute.amazonaws.com:5000",
+  // ApiUrl: "http://ec2-18-118-107-150.us-east-2.compute.amazonaws.com:5000",
+  ApiUrl: "http://localhost:5000",
   setApiRequestToken: (token) => {
     localStorage.setItem("requestToken", JSON.stringify(token));
   },
@@ -11,6 +12,6 @@ const configuration = {
   },
 };
 
-export const clientURL = "http://dev.fe-vietnam.vn:3000";
+export const clientURL = "http://fe-siken-ute.ml/";
 
 export default configuration;
