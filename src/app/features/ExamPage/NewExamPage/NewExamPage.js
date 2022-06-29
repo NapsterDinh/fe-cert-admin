@@ -1,7 +1,7 @@
 import {
   faAngleDoubleRight,
   faHome,
-  faSave
+  faSave,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -11,20 +11,20 @@ import {
   Col,
   Form,
   InputGroup,
-  Row
+  Row,
 } from "@themesberg/react-bootstrap";
 //components
 import { Select, Spin } from "antd";
 import Chart from "app/base/components/Chart/Chart";
 import EditorToolbar, {
   formats,
-  modules
+  modules,
 } from "app/base/components/Editor/EditorToolbar";
 import ModalConfirmDelete from "app/base/components/ModalConfirmDelete/ModalConfirmDelete";
 import { openNotificationWithIcon } from "app/base/components/Notification";
 import {
   editExam,
-  getQuestionById as getQuestionByIDExam
+  getQuestionById as getQuestionByIDExam,
 } from "app/core/apis/exam";
 import { deleteQuestion as deleteQuestionAPI } from "app/core/apis/question";
 import { getAllTopic } from "app/core/apis/topic";
@@ -55,6 +55,7 @@ const NewExamPage = () => {
   const [currentQuestion, setCurrentQuestion] = useState("");
   const [chooseQuestionDelete, setChooseQuestionDelete] = useState("");
   const [loading, setLoading] = useState(false);
+  const [savePercentTopic, setPercentTopic] = useState("");
   const [data, setData] = useState({
     type: "exam",
     title: "",
@@ -85,10 +86,12 @@ const NewExamPage = () => {
   const handleSaveExam = async (values, setSubmitting, resetForm) => {
     const exam = {
       ...values,
+      time: parseInt(values.time),
       eventDate: new Date(values.eventDate).toISOString(),
       questions: values.questions.map((item) => ({
         _id: item.id,
       })),
+      totalQuestions: values.questions.length,
       content: window.btoa(unescape(encodeURIComponent(values.content))),
     };
     try {
@@ -206,6 +209,10 @@ const NewExamPage = () => {
     })();
   }, []);
 
+  useEffect(() => {
+    setPercentTopic(countPercentTopicInExam(data?.questions));
+  }, [data]);
+
   const handleCancelAddNewEdit = () => {
     window.location = "/exam-management";
   };
@@ -226,6 +233,21 @@ const NewExamPage = () => {
       series: [100],
     };
   };
+
+  const getCountByStandardTopic = (name) => {
+    if (savePercentTopic !== "") {
+      const indexTopic = savePercentTopic?.labels?.findIndex(
+        (item) => item === name
+      );
+      if (indexTopic === -1) {
+        return 0;
+      } else {
+        return savePercentTopic?.series[indexTopic];
+      }
+    }
+  };
+
+  console.log(savePercentTopic);
 
   return (
     <>
@@ -524,7 +546,6 @@ const NewExamPage = () => {
 
                                 <InputGroup>
                                   <Form.Control
-                                    disabled
                                     value={values.time}
                                     onChange={handleChange}
                                     onBlur={handleBlur}
@@ -583,7 +604,7 @@ const NewExamPage = () => {
                                   <Form.Control
                                     disabled
                                     name="totalQuestions"
-                                    value={values.totalQuestions}
+                                    value={values.questions.length}
                                     onChange={handleChange}
                                     onBlur={handleBlur}
                                     type="text"
@@ -605,16 +626,55 @@ const NewExamPage = () => {
                                 <Form.Label>Number of Examinees: </Form.Label>
                                 <p>{data?.numberExaminees}</p>
                               </Col>
+                              <Col>
+                                <Form.Label>Standard exam format: </Form.Label>
+                                <p>
+                                  Technology:
+                                  <span
+                                    style={{
+                                      marginLeft: "20px",
+                                      color: "red",
+                                      marginRight: "10px",
+                                    }}
+                                  >
+                                    {getCountByStandardTopic("Technology")}
+                                  </span>
+                                  / 50 questions
+                                </p>
+                                <p>
+                                  Management:
+                                  <span
+                                    style={{
+                                      marginLeft: "20px",
+                                      color: "red",
+                                      marginRight: "10px",
+                                    }}
+                                  >
+                                    {getCountByStandardTopic("Management")}
+                                  </span>
+                                  / 10 questions
+                                </p>
+                                <p>
+                                  Strategy:
+                                  <span
+                                    style={{
+                                      marginLeft: "20px",
+                                      color: "red",
+                                      marginRight: "10px",
+                                    }}
+                                  >
+                                    {getCountByStandardTopic("Strategy")}
+                                  </span>
+                                  / 20 questions
+                                </p>
+                              </Col>
                             </Form.Group>
                             {data?.questions?.length > 0 && (
                               <>
                                 <Form.Label>
                                   Statistic of topic questions:{" "}
                                 </Form.Label>
-                                <Chart
-                                  width={450}
-                                  {...countPercentTopicInExam(data?.questions)}
-                                />
+                                <Chart width={450} {...savePercentTopic} />
                               </>
                             )}
                           </Col>

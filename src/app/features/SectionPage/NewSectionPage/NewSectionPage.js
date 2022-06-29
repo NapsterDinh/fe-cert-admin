@@ -128,6 +128,8 @@ const NewSectionPage = () => {
       }
     } catch (error) {
       alert(error);
+    } finally {
+      setCurrentLecture("");
     }
   };
 

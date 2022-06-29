@@ -65,7 +65,6 @@ const ModalLecture = ({
 
 
   const onHandleSubmit = async (values, setSubmitting, resetForm) => {
-    console.log(values);
     try {
       let response = "";
       if (selectedLecture === "") {
