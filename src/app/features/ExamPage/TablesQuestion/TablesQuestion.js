@@ -1,6 +1,6 @@
 import { SearchOutlined } from "@ant-design/icons";
 import { Card } from "@themesberg/react-bootstrap";
-import { Button, Input, Space, Table, Tag } from "antd";
+import { Button, Input, Space, Table, Tooltip } from "antd";
 import React, { useRef, useState } from "react";
 import Highlighter from "react-highlight-words";
 import { clientURL } from "configuration";
@@ -132,6 +132,17 @@ export const TableQuestion = ({ data, editQuestions, deleteQuestion }) => {
       sorter: (a, b) => a.question < b.question,
       sortDirections: ["descend", "ascend"],
       ...getColumnSearchProps("question"),
+      render: (text) => {
+        return (
+          <Tooltip
+            title={text
+              .replaceAll(/<\/?[^>]+(>|$)/g, "")
+              .replaceAll(`&nbsp;`, " ")}
+          >
+            {text.replaceAll(/<\/?[^>]+(>|$)/g, "").replaceAll(`&nbsp;`, " ")}
+          </Tooltip>
+        );
+      },
     },
     {
       title: "Topic",

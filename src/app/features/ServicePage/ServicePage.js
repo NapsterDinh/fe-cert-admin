@@ -37,9 +37,8 @@ const ServicePage = () => {
 
   const handleDeleteExam = async () => {
     try {
-      const response = await deletePricing({
-        _id: currentService,
-      });
+      console.log(currentService);
+      const response = await deletePricing(currentService?._id);
       if (response.status === 200) {
         await fetchAllExam();
         dispatch(toggleShowModal({ show: false }));

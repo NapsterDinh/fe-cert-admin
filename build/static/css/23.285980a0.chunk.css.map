@@ -1,0 +1,1 @@
+{"version":3,"sources":["webpack://src/app/features/CoursePage/CoursePage.scss"],"names":[],"mappings":"AAAA,eAEI,SAAA,CAEJ,eAEI,SAAA","file":"23.285980a0.chunk.css","sourcesContent":[".select-filter\r\n{\r\n    width: 40%;\r\n}\r\n.select-action\r\n{\r\n    width: 50%;\r\n}"]}

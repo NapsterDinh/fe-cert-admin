@@ -1,13 +1,13 @@
 import { SearchOutlined } from "@ant-design/icons";
 import { Card } from "@themesberg/react-bootstrap";
-import { Button, Input, Space, Table, Tag } from "antd";
+import { Button, Input, Space, Table, Tag, Popconfirm } from "antd";
 import React, { useRef, useState } from "react";
 import Highlighter from "react-highlight-words";
 import { clientURL } from "configuration";
 import { Switch } from "react-router-dom";
 import "./TablesUser.css";
 
-export const TablesUser = ({ data, editExam, deleteExam }) => {
+export const TablesUser = ({ data, toggleBlockUser }) => {
   const [searchText, setSearchText] = useState("");
   const [searchedColumn, setSearchedColumn] = useState("");
   const searchInput = useRef(null);
@@ -183,11 +183,29 @@ export const TablesUser = ({ data, editExam, deleteExam }) => {
       width: "10%",
       align: "center",
       render: (_, record) => {
-        return (
-          <Space size="middle">
-            <Switch defaultChecked />
-          </Space>
-        );
+        if (record?.status === "active") {
+          return (
+            <Popconfirm
+              title="Are you sure to block this user?"
+              onConfirm={() => toggleBlockUser("inactive", record?._id)}
+              okText="Yes"
+              cancelText="No"
+            >
+              <Button type="primary">Block</Button>
+            </Popconfirm>
+          );
+        } else {
+          return (
+            <Popconfirm
+              title="Are you sure to unblock this user?"
+              onConfirm={() => toggleBlockUser("active", record?._id)}
+              okText="Yes"
+              cancelText="No"
+            >
+              <Button>UnBlock</Button>
+            </Popconfirm>
+          );
+        }
       },
     },
   ];

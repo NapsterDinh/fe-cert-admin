@@ -14,7 +14,7 @@ import {
   InputGroup,
   Row,
 } from "@themesberg/react-bootstrap";
-import { Select } from "antd";
+import { Select, Spin } from "antd";
 import ModalConfirmDelete from "app/base/components/ModalConfirmDelete/ModalConfirmDelete";
 import { openNotificationWithIcon } from "app/base/components/Notification";
 import { deleteLesson } from "app/core/apis/lessons";
@@ -57,6 +57,7 @@ const NewSectionPage = () => {
   const [currentLecture, setCurrentLecture] = useState("");
   const modalConfirmDelete = useSelector((state) => state.confirmDelete);
   const [topic, setTopic] = useState([]);
+  const [loading, setLoading] = useState(false);
   const handleSaveSection = async (values) => {
     const section = {
       ...data,
@@ -78,6 +79,7 @@ const NewSectionPage = () => {
 
   const fetchSectionByID = async () => {
     try {
+      setLoading(true);
       const response = await getSectionById(idSection);
       if (response.status === 200) {
         setData({
@@ -87,6 +89,8 @@ const NewSectionPage = () => {
       }
     } catch (error) {
       alert(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -235,151 +239,164 @@ const NewSectionPage = () => {
                   className="table-wrapper table-responsive shadow-sm"
                 >
                   <Card.Body className="pt-0 my-4">
-                    <Row>
-                      <Col lg={7}>
-                        <Form.Group
-                          className={
-                            errors.title && touched.title && "error mb-4"
-                          }
-                          controlId="tutorialTitle"
-                        >
-                          <Form.Label>Title</Form.Label>
-                          <ErrorMessage
-                            name="title"
-                            component="div"
-                            className="invalid-feedback"
-                          />
-                          <InputGroup
-                            className={
-                              errors.title && touched.title && "error mb-3"
-                            }
-                          >
-                            <Form.Control
-                              autoFocus
-                              value={values.title}
-                              onChange={(e) => {
-                                handleChange(e);
-                              }}
-                              onBlur={handleBlur}
+                    <Spin tip={"Loading..."} spinning={loading}>
+                      <>
+                        <Row>
+                          <Col lg={7}>
+                            <Form.Group
                               className={
-                                errors.title && touched.title && "error"
+                                errors.title && touched.title && "error mb-4"
                               }
-                              name="title"
-                              type="text"
-                              placeholder="Enter title"
-                            />
-                          </InputGroup>
-                        </Form.Group>
-                        <Form.Group
-                          className={"form-group mb-3 d-flex"}
-                          as={Col}
-                          controlId="formTitle"
-                        >
-                          <div>
-                            <Form.Label>Status</Form.Label>
-                            <div key={`inline-radio-status`} className="mb-3">
-                              <Form.Check
-                                type={`radio`}
-                                inline
-                                label="Public"
-                                id={`inline-radio-3`}
-                                value="public"
-                                checked={values.status === "public"}
-                                onChange={() =>
-                                  setFieldValue("status", "public")
-                                }
-                                name="status"
+                              controlId="tutorialTitle"
+                            >
+                              <Form.Label>Title</Form.Label>
+                              <ErrorMessage
+                                name="title"
+                                component="div"
+                                className="invalid-feedback"
                               />
-                              <Form.Check
-                                type={`radio`}
-                                inline
-                                label="Private"
-                                id={`inline-radio-5`}
-                                value="private"
-                                checked={values.status === "private"}
-                                onChange={() =>
-                                  setFieldValue("status", "private")
+                              <InputGroup
+                                className={
+                                  errors.title && touched.title && "error mb-3"
                                 }
-                                name="status"
+                              >
+                                <Form.Control
+                                  autoFocus
+                                  value={values.title}
+                                  onChange={(e) => {
+                                    handleChange(e);
+                                  }}
+                                  onBlur={handleBlur}
+                                  className={
+                                    errors.title && touched.title && "error"
+                                  }
+                                  name="title"
+                                  type="text"
+                                  placeholder="Enter title"
+                                />
+                              </InputGroup>
+                            </Form.Group>
+                            <Form.Group
+                              className={"form-group mb-3 d-flex"}
+                              as={Col}
+                              controlId="formTitle"
+                            >
+                              <div>
+                                <Form.Label>Status</Form.Label>
+                                <div
+                                  key={`inline-radio-status`}
+                                  className="mb-3"
+                                >
+                                  <Form.Check
+                                    type={`radio`}
+                                    inline
+                                    label="Public"
+                                    id={`inline-radio-3`}
+                                    value="public"
+                                    checked={values.status === "public"}
+                                    onChange={() =>
+                                      setFieldValue("status", "public")
+                                    }
+                                    name="status"
+                                  />
+                                  <Form.Check
+                                    type={`radio`}
+                                    inline
+                                    label="Private"
+                                    id={`inline-radio-5`}
+                                    value="private"
+                                    checked={values.status === "private"}
+                                    onChange={() =>
+                                      setFieldValue("status", "private")
+                                    }
+                                    name="status"
+                                  />
+                                </div>
+                              </div>
+                            </Form.Group>
+                          </Col>
+                          <Col lg={4} className="">
+                            <div
+                              className={
+                                errors.topic && touched.topic && "error mb-4"
+                              }
+                            >
+                              <Form.Label style={{ marginRight: "20px" }}>
+                                Topic
+                              </Form.Label>
+                              <Select
+                                style={{ width: "300px" }}
+                                value={values.topic}
+                                onChange={(values) =>
+                                  setFieldValue("topic", values)
+                                }
+                              >
+                                {topic?.map((t) => (
+                                  <Option key={t._id} value={t._id}>
+                                    {t.title}
+                                  </Option>
+                                ))}
+                              </Select>
+                              <p
+                                style={{
+                                  color: "red",
+                                  marginTop: "20px",
+                                  fontSize: "12.25px",
+                                }}
+                              >
+                                {errors.topic}
+                              </p>
+
+                              <ErrorMessage
+                                name="topic"
+                                component="div"
+                                className="invalid-feedback"
                               />
                             </div>
-                          </div>
-                        </Form.Group>
-                      </Col>
-                      <Col lg={4} className="">
-                        <div
-                          className={
-                            errors.topic && touched.topic && "error mb-4"
-                          }
-                        >
-                          <Form.Label style={{ marginRight: "20px" }}>
-                            Topic
-                          </Form.Label>
-                          <Select
-                            style={{ width: "300px" }}
-                            value={values.topic}
-                            onChange={(values) =>
-                              setFieldValue("topic", values)
-                            }
+                          </Col>
+                        </Row>
+                        <Row>
+                          <Form.Group
+                            className="mb-3"
+                            controlId="formDescription"
                           >
-                            {topic?.map((t) => (
-                              <Option key={t._id} value={t._id}>
-                                {t.title}
-                              </Option>
-                            ))}
-                          </Select>
-                          <p
-                            style={{
-                              color: "red",
-                              marginTop: "20px",
-                              fontSize: "12.25px",
-                            }}
-                          >
-                            {errors.topic}
-                          </p>
+                            <div className="d-flex justify-content-between my-3">
+                              <Form.Label
+                                style={{ lineHeight: "36px", fontSize: "20px" }}
+                              >
+                                Lessons List
+                              </Form.Label>
+                              <Button
+                                className="mx-2"
+                                onClick={() => setShowLecture(true)}
+                              >
+                                <FontAwesomeIcon
+                                  icon={faPlus}
+                                  className="me-2"
+                                />
+                                New Lesson
+                              </Button>
+                            </div>
 
-                          <ErrorMessage
-                            name="topic"
-                            component="div"
-                            className="invalid-feedback"
-                          />
-                        </div>
-                      </Col>
-                    </Row>
-                    <Row>
-                      <Form.Group className="mb-3" controlId="formDescription">
-                        <div className="d-flex justify-content-between my-3">
-                          <Form.Label
-                            style={{ lineHeight: "36px", fontSize: "20px" }}
-                          >
-                            Lessons List
-                          </Form.Label>
-                          <Button
-                            className="mx-2"
-                            onClick={() => setShowLecture(true)}
-                          >
-                            <FontAwesomeIcon icon={faPlus} className="me-2" />
-                            New Lesson
-                          </Button>
-                        </div>
-
-                        <TableLectures
-                          data={data?.lessons
-                            ?.map((item) => ({
-                              ...item,
-                              id: item._id,
-                              key: item._id,
-                            }))
-                            ?.sort(
-                              (a, b) =>
-                                new Date(b.updatedAt).getTime() -
-                                new Date(a.updatedAt).getTime()
-                            )}
-                          editLecture={editLecture}
-                          deleteLecture={deleteLecture}
-                        />
-                      </Form.Group>
-                    </Row>
+                            <TableLectures
+                              data={data?.lessons
+                                ?.map((item) => ({
+                                  ...item,
+                                  id: item._id,
+                                  key: item._id,
+                                }))
+                                ?.sort(
+                                  (a, b) =>
+                                    new Date(b.updatedAt).getTime() -
+                                    new Date(a.updatedAt).getTime()
+                                )}
+                              editLecture={editLecture}
+                              deleteLecture={deleteLecture}
+                            />
+                          </Form.Group>
+                        </Row>
+                      </>
+                    </Spin>
                   </Card.Body>
                 </Card>
               </div>

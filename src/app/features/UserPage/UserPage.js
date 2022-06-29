@@ -1,14 +1,14 @@
-import { faHome, faPlus } from "@fortawesome/free-solid-svg-icons";
+import { faHome } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Breadcrumb, Button } from "@themesberg/react-bootstrap";
-import { openNotificationWithIcon } from "app/base/components/Notification";
-import { getAllUsers } from "app/core/apis/user";
+import { Breadcrumb } from "@themesberg/react-bootstrap";
+import { getAllUsers, toggleBlockUserAPI } from "app/core/apis/user";
 //data
 import { Routes } from "app/routes";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { toggleShowModal, updateModalInfo } from "store/confirmDeleteReducer";
+import { updateModalInfo } from "store/confirmDeleteReducer";
 import TablesUser from "./TablesUser/TablesUser";
+import { openNotificationWithIcon } from "app/base/components/Notification";
 
 const UserPage = () => {
   const [data, setData] = useState([]);
@@ -41,6 +41,30 @@ const UserPage = () => {
       }
     } catch (error) {}
   };
+  const toggleBlockUser = async (nextStatus, id) => {
+    try {
+      const response = await toggleBlockUserAPI({
+        status: nextStatus,
+        user: id,
+      });
+      if (response?.status === 200) {
+        await fetchAllExam();
+        openNotificationWithIcon(
+          "success",
+          `${nextStatus ? "Block" : "Unblock"} a new topic successfully`
+        );
+      } else {
+        openNotificationWithIcon(
+          "error",
+          `${nextStatus ? "Block" : "Unblock"} a new topic failed`
+        );
+        console.log(response?.error);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   useEffect(() => {
     (async () => {
       await fetchAllExam();
@@ -75,7 +99,11 @@ const UserPage = () => {
       </div>
 
       <div className="table-settings mb-4">
-        <TablesUser data={data} handleShow={handleShow} />
+        <TablesUser
+          data={data}
+          handleShow={handleShow}
+          toggleBlockUser={toggleBlockUser}
+        />
       </div>
     </>
   );

@@ -36,12 +36,11 @@ const initialValues = {
   type: "exam",
   title: "",
   description: "",
-  content: "",
+  content: `<p>This Exam is based on the Morning session of origin FE exam. There would be 80 questions in total and 2h30m time to do it, which distribute largely in 3 sections:</p><ul><li>Technology: 50 questions</li><li>Management: 10 questions</li><li>Strategy: 20 questions.</li></ul><p>All questions are in single-choice question type. Candidate is considered as "Passed" if he/she has more than 60% of right answers, which means more than 48 questions.</p><p>Rules:</p><p>-&nbsp;Maximum number of tests:&nbsp;100</p><p class="ql-align-center"><br></p>`,
   status: "Private",
 };
 
 const ModalAddNewExamAdmin = ({ show, handleClose, fetchAllExam }) => {
-
   const onHandleSubmit = async (values, setSubmitting, resetForm) => {
     try {
       const response = await addNewExam({
@@ -51,7 +50,7 @@ const ModalAddNewExamAdmin = ({ show, handleClose, fetchAllExam }) => {
         totalQuestions: 80,
         isSessionMorning: true,
         content: window.btoa(unescape(encodeURIComponent(values.content))),
-        isPublic: 'Private',
+        isPublic: "Private",
       });
       if (response.status === 201) {
         await fetchAllExam();

@@ -20,3 +20,7 @@ export const logout = (data) => {
 export const deleteUser = (data) => {
   return _delete("/api/v1/user");
 };
+
+export const toggleBlockUserAPI = (data) => {
+  return _post("/api/v1/user/update-status", data);
+};

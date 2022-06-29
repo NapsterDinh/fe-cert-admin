@@ -7,19 +7,13 @@ import {
   InputGroup,
   Modal,
 } from "@themesberg/react-bootstrap";
-import { Input, Space, Table, Tabs, Tag, Button as AntdButton } from "antd";
+import { Input, Space, Table, Tabs, Tag } from "antd";
 import EditorToolbar, {
   formats,
   modules,
 } from "app/base/components/Editor/EditorToolbar";
 import { openNotificationWithIcon } from "app/base/components/Notification";
-import { getAllSection } from "app/core/apis/section";
-import {
-  addNewTopic,
-  editTopic,
-  getTopicById,
-  getTopicSectionByNonId,
-} from "app/core/apis/topic";
+import { addNewTopic, editTopic } from "app/core/apis/topic";
 import { ErrorMessage, Field, Formik } from "formik";
 import React, { useEffect, useRef, useState } from "react";
 import Highlighter from "react-highlight-words";
@@ -68,6 +62,9 @@ export const ModalModule = ({
         sections: [],
         status: values.status,
       });
+      resetForm();
+      await getAllTopic();
+      handleClose();
       openNotificationWithIcon("success", "Create a new topic successfully");
     } else {
       await editTopic({
@@ -84,11 +81,11 @@ export const ModalModule = ({
         sections: currentTopic?.sections,
         status: values.status,
       });
+      resetForm();
+      await getAllTopic();
+      handleClose();
       openNotificationWithIcon("success", "Edit topic successfully");
     }
-    resetForm();
-    await getAllTopic();
-    handleClose();
   };
 
   useEffect(() => {
@@ -188,22 +185,20 @@ export const ModalModule = ({
                             Note*: Use SubHeading if you want to make table of
                             content
                           </span>
-                          {currentTopic !== "" && (
-                            <Field name="description">
-                              {({ field }) => (
-                                <div className="text-editor">
-                                  <EditorToolbar />
-                                  <ReactQuill
-                                    theme="snow"
-                                    modules={modules}
-                                    formats={formats}
-                                    value={field.value}
-                                    onChange={field.onChange(field.name)}
-                                  />
-                                </div>
-                              )}
-                            </Field>
-                          )}
+                          <Field name="description">
+                            {({ field }) => (
+                              <div className="text-editor">
+                                <EditorToolbar />
+                                <ReactQuill
+                                  theme="snow"
+                                  modules={modules}
+                                  formats={formats}
+                                  value={field.value}
+                                  onChange={field.onChange(field.name)}
+                                />
+                              </div>
+                            )}
+                          </Field>
                           <ErrorMessage
                             name="description"
                             component="div"
